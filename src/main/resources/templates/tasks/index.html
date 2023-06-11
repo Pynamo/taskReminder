@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<head>
+</head>
+<body>
+	<div layout:fragment="contents">
+
+		<!-- 新規作成画面遷移フォーム -->
+		<form method="get" class="form-horizontal" th:action="@{/create}">
+			<input type="submit" class="btn btn-primary btn-lg" name="form" th:value="#{A0001_add_task_button}" />
+		</form>
+		
+		<!-- 削除画面遷移フォーム -->
+		<form method="get" class="form-horizontal" th:action="@{/delete}">
+			<input type="submit" class="btn btn-danger btn-lg" name="form" th:value="#{A0001_delete_task_button}" />
+		</form>
+
+		<!-- 登録済タスク一覧 -->
+		<div th:each="item : ${list}">
+			<div class="card">
+				<h5 class="card-header" th:text="${item.name}"></h5>
+				<div class="card-body">
+					<h5 class="card-title" th:text="${item.content}"></h5>
+					<p class="card-text" th:text="${item.userId}"></p>
+					
+					<!-- タスク実行フォーム -->
+					<form method="post" class="form-horizontal" th:action="@{/execute}">
+						<input type="hidden" name="task_id" th:value="${item.taskId}" />
+						<input type="submit" class="btn btn-primary" th:value="タスク完了" />
+					</form>
+					
+					<!-- タスク変更、詳細画面遷移フォーム -->
+					<form method="get" class="form-horizontal" th:action="@{/task}">
+						<input type="hidden" name="task_id" th:value="${item.taskId}" />
+						<input type="submit" class="btn btn-outline-primary" name="update" th:value="変更" />
+						<input type="submit" class="btn btn-outline-success" name="detail" th:value="詳細" />
+					</form>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</body>
+</html>

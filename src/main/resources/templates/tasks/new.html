@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<head>
+</head>
+<body>
+	<div layout:fragment="contents">
+		<div class="container">
+			<h1>New</h1>
+			<form th:object="${taskForm}" method="post" class="form-horizontal" th:action="@{/create}">
+				
+				<div class="mb-3">
+					<label class="form-label" th:text="#{A0002_task_name_input_label}">郢ｧ�ｽｿ郢ｧ�ｽｹ郢ｧ�ｽｯ陷ｷ�ｿｽ</label> 
+					<span class="text-danger" th:errors=*{name}></span>
+					<input type="text" class="form-control" th:field="*{name}">
+				</div>
+				<div class="mb-3">
+					<label class="form-label" th:text="#{A0002_task_load_input_label}">髮具ｿｽ髣包ｽｷ</label> 
+					<select class="form-select"	th:field="*{load}">
+						<option th:each="item : ${loadMst}" th:value="${item.key}" th:text="${item.value}"></option>
+					</select>
+				</div>
+				<div class="mb-3">
+					<label class="form-label" th:text="#{A0002_task_content_input_label}">隲｢荵暦ｽｰ闍難ｽｾ�ｽｼ邵ｺ�ｽｿ</label> 
+					<span class="text-danger" th:errors=*{content}></span>
+					<textarea class="form-control" th:field="*{content}" rows="10"></textarea>
+				</div>
+				<input type="hidden" th:field="*{taskId}" />
+				<input type="submit" class="btn btn-primary btn-lg" name="confirm" th:value="#{A0002_add_task_button}" />
+			</form>
+		</div>
+	</div>
+</body>
+</html>

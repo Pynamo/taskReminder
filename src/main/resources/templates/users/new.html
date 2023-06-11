@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<head>
+</head>
+<body>
+	<div layout:fragment="contents">
+		<div class="container">
+			<h1>New User</h1>
+			<form th:object="${userForm}" method="post" class="form-horizontal" th:action="@{/users/create}">
+				
+				<div class="mb-3">
+					<label class="form-label" th:text="#{A0008_user_name_input_label}">ユーザー名</label> 
+					<span class="text-danger" th:errors=*{name}></span>
+					<input type="text" class="form-control" th:field="*{name}">
+				</div>
+				<div class="mb-3">
+					<label class="form-label" th:text="#{A0008_user_email_input_label}">メールアドレス</label> 
+					<span class="text-danger" th:errors=*{email}></span>
+					<input type="text" class="form-control" th:field="*{email}">
+				</div>
+				<div class="mb-3">
+					<label class="form-label" th:text="#{A0008_user_password_input_label}">パスワード</label> 
+					<span class="text-danger" th:errors=*{password}></span>
+					<input type="password" class="form-control" th:field="*{password}">
+				</div>
+				<div class="mb-3">
+					<label class="form-label" th:text="#{A0008_user_password_confirm_label}">パスワード（確認）</label> 
+					<span class="text-danger" th:errors=*{passwordConfirmation}></span>
+					<input type="password" class="form-control" th:field="*{passwordConfirmation}">
+				</div>
+				<input type="submit" class="btn btn-primary btn-lg" th:value="#{A0008_add_user_button}" />
+			</form>
+		</div>
+	</div>
+</body>
+</html>

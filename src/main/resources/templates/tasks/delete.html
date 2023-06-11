@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<head>
+</head>
+<body>
+	<div layout:fragment="contents">
+
+		<a class="btn btn-secondary btn-lg" th:href="@{/}" th:value="#{SYSCOMMON.back_button}">戻る</a>
+
+		<div th:each="pl, itemStat : ${list}">
+			<form method="post" class="form-horizontal" th:action="@{/delete}">
+				<div class="card">
+					<h5 class="card-header" th:text="${list[__${itemStat.index}__].name}"></h5>
+					<div class="card-body">
+						<h5 class="card-title" th:text="${list[__${itemStat.index}__].content}"></h5>
+						<p class="card-text" th:text="${list[__${itemStat.index}__].userId}"></p>
+						<p class="card-text" th:text="${list[__${itemStat.index}__].taskId}"></p>
+						<input type="hidden" name="task_id" th:value="${list[__${itemStat.index}__].taskId}" />
+						<input type="submit" class="btn btn-danger" th:value="タスク削除" />
+					</div>
+				</div>
+			</form>
+		</div>
+		
+	</div>
+</body>
+</html>
