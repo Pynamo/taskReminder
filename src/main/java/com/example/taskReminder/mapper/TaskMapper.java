@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-
+import com.example.taskReminder.common.Delete;
 import com.example.taskReminder.common.Load;
 import com.example.taskReminder.common.Status;
 
@@ -19,6 +19,7 @@ public interface TaskMapper {
 	
 	TaskMapper INSTANCE = Mappers.getMapper(TaskMapper.class);
 	
+	
     default Task formToTask(TaskForm taskForm, UserInf user) {
         Task task = new Task();
         //task.setLoad(Load.getValue(taskForm.getLoad()));
@@ -27,11 +28,11 @@ public interface TaskMapper {
         task.setLoad(Load.getValue(taskForm.getLoad()));
         task.setContent(taskForm.getContent());
         task.setStatus(Status.NON_EXECTED);
+        task.setDeleted(Delete.VALID);
         task.setUserId(user.getUserId());
         return task;
     }
     
-   
     default List<TaskForm> tasksToTaskForm(Iterable<Task> tasks) {
     	
     	List<TaskForm> list = new ArrayList<>();

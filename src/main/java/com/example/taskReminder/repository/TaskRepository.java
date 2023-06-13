@@ -11,17 +11,17 @@ public interface TaskRepository extends JpaRepository <Task, Long> {
 
 	// 検索条件にnullを含めるのはOK？
 	@Query(value = "select * from tasks "
-			+ "where user_id = ?1 and deleted is null;",
+			+ "where user_id = ?1 and deleted = '0';",
 			nativeQuery = true)
 	Iterable<Task> myFindByUserId(Long userId);
 
 	@Query(value = "select count(*) from tasks "
-			+ "where user_id = ?1 and deleted is null;",
+			+ "where user_id = ?1 and deleted = '0';",
 			nativeQuery = true)
 	Integer countByUserIdAndNotDeleted(Long userId);
 
 	@Query(value = "select * from tasks "
-			+ "where task_id = ?1 and deleted is null;",
+			+ "where task_id = ?1 and deleted = '0';",
 			nativeQuery = true)
 	Task myfindByTaskId(Long taskId);
 

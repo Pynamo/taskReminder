@@ -7,16 +7,22 @@
 
 		<a class="btn btn-secondary btn-lg" th:href="@{/}" th:value="#{SYSCOMMON.back_button}">戻る</a>
 
+		<form method="post" class="form-horizontal" th:action="@{/deleteAll}">
+			<input type="submit" class="btn btn-danger" th:value="選択したタスクを全て削除する" />
+			
+		</form>
+
+		
+
 		<div th:each="pl, itemStat : ${list}">
 			<form method="post" class="form-horizontal" th:action="@{/delete}">
 				<div class="card">
 					<h5 class="card-header" th:text="${list[__${itemStat.index}__].name}"></h5>
 					<div class="card-body">
 						<h5 class="card-title" th:text="${list[__${itemStat.index}__].content}"></h5>
-						<p class="card-text" th:text="${list[__${itemStat.index}__].userId}"></p>
-						<p class="card-text" th:text="${list[__${itemStat.index}__].taskId}"></p>
 						<input type="hidden" name="task_id" th:value="${list[__${itemStat.index}__].taskId}" />
-						<input type="submit" class="btn btn-danger" th:value="タスク削除" />
+						<input type="checkbox" />
+						<input type="submit" class="btn btn-danger" th:value="削除する" />
 					</div>
 				</div>
 			</form>

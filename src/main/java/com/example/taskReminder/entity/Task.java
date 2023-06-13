@@ -46,8 +46,15 @@ public class Task extends AbstractEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private Status status;
     
-    //@Enumerated(EnumType.STRING)
     private String deleted;
+    
+    
+    public void setDeleted(Delete deleted) {
+    	this.deleted = deleted.getCode();
+    }
+    public Delete getDeleted() {
+    	return Delete.getValue(this.deleted);
+    }
     
     /*
     @ManyToOne

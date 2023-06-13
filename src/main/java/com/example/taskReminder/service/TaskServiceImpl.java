@@ -1,16 +1,19 @@
 package com.example.taskReminder.service;
 
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.example.taskReminder.common.Delete;
 import com.example.taskReminder.entity.Task;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
-import com.example.taskReminder.exception.SystemException;
 import com.example.taskReminder.form.TaskForm;
 import com.example.taskReminder.mapper.TaskMapper;
 import com.example.taskReminder.repository.TaskRepository;
@@ -22,18 +25,23 @@ public class TaskServiceImpl implements TaskService {
 
 	@Autowired
     TaskRepository taskRepository;
+	
+	// TODO 最大値の範囲を指定したい場合はどうすれば？
+	// TODO 書き換えられてしまうのでは？
+	@Value("${max.registration:5}")
+	private int max_registration;
 
 	/**
 	 * タスク登録処理
 	 * 登録済のタスクが3つ以上であればBusinessExceptionを投げる
-	 * TODO 返り値なしで大丈夫？
 	 */
 	@Override
 	public void save(TaskForm taskForm, UserInf user) throws BusinessException {
 		
 		int registeredCounter =  taskRepository.countByUserIdAndNotDeleted(user.getUserId());
 		
-		if(registeredCounter >= 3) {
+		// TODO 定数はプロパティ上で管理する
+		if(registeredCounter >= max_registration) {
 			throw new BusinessException("3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう");
 		}
 
@@ -51,7 +59,7 @@ public class TaskServiceImpl implements TaskService {
 	public Iterable<Task> getTaskList(Long userId) throws ResourceNotFoundException {
 		
 		Iterable<Task> tasks = taskRepository.myFindByUserId(userId);
-		if(tasks == null) {
+		if(Objects.isNull(tasks)) {
 			throw new ResourceNotFoundException("Task not found!");
 		}
 		return tasks;
@@ -61,22 +69,21 @@ public class TaskServiceImpl implements TaskService {
 	 * タスク削除処理
 	 * タスクが見つからなければResourceNotFoundExceptionを投げる
 	 * タスクが既に削除されていればSystemExceptionを投げる
-	 * TODO 削除フラグ直書きだがenumがいい？
-	 * TODO 返り値ないが大丈夫？
-	 * TODO 比較にnull使うのはダメ？
+	 * @throws BusinessException 
 	 */
 	@Override
-	public void deleteTask(Long taskId) throws ResourceNotFoundException, SystemException {
+	public void deleteTask(Long taskId) throws ResourceNotFoundException, BusinessException {
 		
 		Task task = taskRepository.myfindByTaskId(taskId);
 		
-		if(task == null) {
+		if(Objects.isNull(task)) {
 			throw new ResourceNotFoundException("Task not found!");
 		}
-		if(task.getDeleted() != null) {
-			throw new SystemException("Task is deleted!");
+		
+		if(task.getDeleted().equals(Delete.DELETED)) {
+			throw new BusinessException("Task is deleted!");
 		}
-		task.setDeleted("1");
+		task.setDeleted(Delete.DELETED);
 		taskRepository.save(task);	
 	}
 
@@ -84,13 +91,12 @@ public class TaskServiceImpl implements TaskService {
 	/**
 	 * タスク取得（1個)
 	 * 登録済のタスクが見つからなければResourceNotFoundExceptionを投げる
-	 * TODO 比較にnull使うのはダメ？
 	 */
 	@Override
 	public Task getTask(Long taskId) throws ResourceNotFoundException {
 		
 		Task task = taskRepository.myfindByTaskId(taskId);
-		if(task == null) {
+		if(Objects.isNull(task)) {
 			throw new ResourceNotFoundException("Task not found!");
 		}
 		return task;

@@ -4,7 +4,6 @@ import com.example.taskReminder.entity.Task;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
-import com.example.taskReminder.exception.SystemException;
 import com.example.taskReminder.form.TaskForm;
 
 public interface TaskService {
@@ -15,7 +14,7 @@ public interface TaskService {
 	Iterable<Task> getTaskList(Long userId) throws ResourceNotFoundException;
 
 	// TODO 返り値の型は何が正解？
-	void deleteTask(Long taskId) throws ResourceNotFoundException, SystemException;
+	void deleteTask(Long taskId) throws ResourceNotFoundException, BusinessException;
 
 	Task getTask(Long taskId) throws ResourceNotFoundException;
 

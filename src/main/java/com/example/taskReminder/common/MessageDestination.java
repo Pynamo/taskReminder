@@ -1,14 +1,14 @@
 package com.example.taskReminder.common;
 
-public enum Delete {
+public enum MessageDestination {
 	
-	VALID("0", "有効"),
-	DELETED("1", "削除済");
+	FORWARD("0", "フォワード先"),
+	REDIRECT("1", "リダイレクト先");
 	
 	private String code;
     private String name;
     
-    private Delete(String code, String name) {
+    private MessageDestination(String code, String name) {
         this.code = code;
         this.name = name;
     }
@@ -20,9 +20,9 @@ public enum Delete {
         return name;
     }	
     
-    public static Delete getValue(String code) {
-    	Delete[] array = values();
-    	for(Delete num : array) {
+    public static MessageDestination getValue(String code) {
+    	MessageDestination[] array = values();
+    	for(MessageDestination num : array) {
     		if(code.equals(num.getCode())) {
     			return num;
     		}

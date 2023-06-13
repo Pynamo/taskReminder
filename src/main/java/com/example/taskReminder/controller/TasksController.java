@@ -25,7 +25,6 @@ import com.example.taskReminder.entity.Task;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
-import com.example.taskReminder.exception.SystemException;
 
 //import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
 //import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
@@ -210,7 +209,7 @@ public class TasksController {
 			model.addAttribute("hasMessage", true);
 	    	model.addAttribute("class", "alert-danger");
 	    	model.addAttribute("message", "削除する対象が見つかりません");
-		} catch(SystemException e) {
+		} catch(BusinessException e) {
 			log.error("Task is deleted!");
 			model.addAttribute("hasMessage", true);
 	    	model.addAttribute("class", "alert-danger");

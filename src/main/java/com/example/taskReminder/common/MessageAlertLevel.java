@@ -1,14 +1,15 @@
 package com.example.taskReminder.common;
 
-public enum Delete {
+public enum MessageAlertLevel {
 	
-	VALID("0", "有効"),
-	DELETED("1", "削除済");
+	SUCCESS("alert-danger", "成功"),
+	WARNING("alert-warning", "警告"),
+	ERROR("alert-danger", "エラー");
 	
 	private String code;
     private String name;
     
-    private Delete(String code, String name) {
+    private MessageAlertLevel(String code, String name) {
         this.code = code;
         this.name = name;
     }
@@ -20,9 +21,9 @@ public enum Delete {
         return name;
     }	
     
-    public static Delete getValue(String code) {
-    	Delete[] array = values();
-    	for(Delete num : array) {
+    public static MessageAlertLevel getValue(String code) {
+    	MessageAlertLevel[] array = values();
+    	for(MessageAlertLevel num : array) {
     		if(code.equals(num.getCode())) {
     			return num;
     		}
