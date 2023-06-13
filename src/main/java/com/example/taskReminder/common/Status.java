@@ -1,5 +1,6 @@
 package com.example.taskReminder.common;
 
+// TODO 定数クラスで出た例外はどこで拾う？
 public enum Status {
 	
 	NON_EXECTED("0", "未実施"),
@@ -23,7 +24,7 @@ public enum Status {
     public static Status getValue(String code) {
     	Status[] array = values();
     	for(Status num : array) {
-    		if(code == num.getCode()) {
+    		if(code.equals(num.getCode())) {
     			return num;
     		}
     	}

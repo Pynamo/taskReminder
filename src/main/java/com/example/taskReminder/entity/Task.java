@@ -36,17 +36,32 @@ public class Task extends AbstractEntity implements Serializable {
     @Column(nullable = false, name="user_id")
     private Long userId;
 
-    @Enumerated(EnumType.STRING)
-    private Load load;
+    //@Enumerated(EnumType.STRING)
+    private String load;
     
     private String name;
     
     private String content;
     
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    //@Enumerated(EnumType.STRING)
+    private String status;
     
     private String deleted;
+    
+    
+    public void setLoad(Load load) {
+    	this.load = load.getCode();
+    }
+    public Load getLoad() {
+    	return Load.getValue(this.load);
+    }
+    
+    public void setStatus(Status status) {
+    	this.status = status.getCode();
+    }
+    public Status getStatus() {
+    	return Status.getValue(this.status);
+    }
     
     
     public void setDeleted(Delete deleted) {

@@ -2,7 +2,7 @@ package com.example.taskReminder.common;
 
 public enum MessageAlertLevel {
 	
-	SUCCESS("alert-danger", "成功"),
+	SUCCESS("alert-success", "成功"),
 	WARNING("alert-warning", "警告"),
 	ERROR("alert-danger", "エラー");
 	

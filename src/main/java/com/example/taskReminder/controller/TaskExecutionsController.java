@@ -14,8 +14,6 @@ import com.example.taskReminder.exception.SystemException;
 import com.example.taskReminder.service.TaskExecuteService;
 import com.example.taskReminder.service.TaskService;
 import com.example.taskReminder.common.MessageAlertLevel;
-import com.example.taskReminder.common.MessageDestination;
-
 
 @Controller
 public class TaskExecutionsController {
@@ -26,8 +24,6 @@ public class TaskExecutionsController {
 	TaskService taskService;
 	@Autowired
 	TaskExecuteService taskExecuteService;
-
-	// TODO メッセージ表示処理はHelper関数で行う（logはcatchの部分で出すのが正解）
 	
 	/**
 	 * タスク実行処理
@@ -42,21 +38,26 @@ public class TaskExecutionsController {
 		try {
 			taskExecuteService.execute(taskId);
 			log.error("execute!");
-			redirAttrs.addFlashAttribute("hasMessage", true);
-			redirAttrs.addFlashAttribute("class", "alert-success");
-			redirAttrs.addFlashAttribute("message", "実行しました");
+			displayMessageRedirectHelper(
+					MessageAlertLevel.SUCCESS, 
+					"実行しました", 
+					redirAttrs
+					);
+			
 		} catch(SystemException e) {
-			log.error("Task is already executed!");
-			redirAttrs.addFlashAttribute("hasMessage", true);
-			redirAttrs.addFlashAttribute("class", "alert-danger");
-			redirAttrs.addFlashAttribute("message", "システム例外");
+			displayMessageRedirectHelper(
+					MessageAlertLevel.ERROR, 
+					"システム例外", 
+					redirAttrs
+					);
+			
 		} catch(BusinessException e) {
 			log.error("Task is already executed!");
+			displayMessageRedirectHelper(
+					MessageAlertLevel.ERROR, 
+					"システム例外", 
+					redirAttrs);
 			
-			displayMessageRedirectHelper(MessageAlertLevel.ERROR, "システム例外", redirAttrs);
-			//redirAttrs.addFlashAttribute("hasMessage", true);
-			//redirAttrs.addFlashAttribute("class", "alert-danger");
-			//redirAttrs.addFlashAttribute("message", "システム例外");
 		}
 		return "redirect:/";
 	}

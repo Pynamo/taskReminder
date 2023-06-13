@@ -39,12 +39,11 @@ public class TaskServiceImpl implements TaskService {
 	public void save(TaskForm taskForm, UserInf user) throws BusinessException {
 		
 		int registeredCounter =  taskRepository.countByUserIdAndNotDeleted(user.getUserId());
-		
-		// TODO 定数はプロパティ上で管理する
+
 		if(registeredCounter >= max_registration) {
+			// TODO エラーメッセージのタスク上限を変数化する
 			throw new BusinessException("3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう");
 		}
-
 		Task task = TaskMapper.INSTANCE.formToTask(taskForm, user);
 		taskRepository.save(task);
 	}
@@ -52,8 +51,7 @@ public class TaskServiceImpl implements TaskService {
 	/**
 	 * 登録済タスク一覧取得
 	 * タスクがひとつも登録されていない場合はResourceNotFoundExceptionを投げる
-	 * TODO 型はIterableでいい？Listと何が違う？
-	 * TODO 比較にnull使うのはダメ？
+	 * TODO 型をListに変更する
 	 */
 	@Override
 	public Iterable<Task> getTaskList(Long userId) throws ResourceNotFoundException {

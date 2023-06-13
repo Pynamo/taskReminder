@@ -43,9 +43,9 @@ public interface TaskMapper {
     		form.setName(entity.getName());
     		form.setContent(entity.getContent());
     		form.setLoad(entity.getLoad().getName());
+    		
     		form.setStatus(entity.getStatus().getCode());
     		form.setUserId(entity.getUserId());
-    		
     		list.add(form);
     	}
     	return list;
