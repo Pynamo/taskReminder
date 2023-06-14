@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.taskReminder.common.Load;
+import com.example.taskReminder.common.MessageAlertLevel;
 import com.example.taskReminder.form.TaskForm;
 import com.example.taskReminder.mapper.TaskMapper;
 import com.example.taskReminder.service.TaskService;
@@ -144,10 +145,12 @@ public class TasksController {
         try {
         	taskService.save(taskForm, user);
         } catch(BusinessException e) {
+        	
         	log.error("Task is full!");
-        	redirAttrs.addFlashAttribute("hasMessage", true);
-        	redirAttrs.addFlashAttribute("class", "alert-danger");
-        	redirAttrs.addFlashAttribute("message", "3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう");
+        	displayMessageRedirectHelper(
+					MessageAlertLevel.ERROR, 
+					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう", 
+					redirAttrs);
 	    	
 	    	return "redirect:/";
         }
@@ -206,14 +209,16 @@ public class TasksController {
 			taskService.deleteTask(taskId);
 		} catch(ResourceNotFoundException e) {
 			log.error("Task not found!");
-			model.addAttribute("hasMessage", true);
-	    	model.addAttribute("class", "alert-danger");
-	    	model.addAttribute("message", "削除する対象が見つかりません");
+			displayMessageForwardHelper(
+					MessageAlertLevel.ERROR, 
+					"削除する対象が見つかりません", 
+					model);
 		} catch(BusinessException e) {
 			log.error("Task is deleted!");
-			model.addAttribute("hasMessage", true);
-	    	model.addAttribute("class", "alert-danger");
-	    	model.addAttribute("message", "対象は既に削除されています");
+			displayMessageForwardHelper(
+					MessageAlertLevel.ERROR, 
+					"対象は既に削除されています", 
+					model);
 		}
 		
 		return "redirect:/delete?form";
@@ -234,9 +239,10 @@ public class TasksController {
 			task = taskService.getTask(taskId);
 		} catch(ResourceNotFoundException e) {
 			log.error("Task is not found!");
-			model.addAttribute("hasMessage", true);
-	    	model.addAttribute("class", "alert-danger");
-	    	model.addAttribute("message", "対象が見つかりません");
+			displayMessageForwardHelper(
+					MessageAlertLevel.ERROR, 
+					"対象が見つかりません", 
+					model);
 		}
 
 		TaskForm taskForm = TaskMapper.INSTANCE.taskToForm(task);
@@ -262,9 +268,10 @@ public class TasksController {
 			task = taskService.getTask(taskId);
 		} catch(ResourceNotFoundException e) {
 			log.error("Task is not found!");
-			model.addAttribute("hasMessage", true);
-	    	model.addAttribute("class", "alert-danger");
-	    	model.addAttribute("message", "対象が見つかりません");
+			displayMessageForwardHelper(
+					MessageAlertLevel.ERROR, 
+					"対象が見つかりません", 
+					model);
 		}
 
 		TaskForm taskForm = TaskMapper.INSTANCE.taskToForm(task);
@@ -274,5 +281,26 @@ public class TasksController {
 	}
 	
 
+	private void displayMessageRedirectHelper(
+			MessageAlertLevel level,
+			String message,
+			RedirectAttributes redirAttrs) {
+		
+		redirAttrs.addFlashAttribute("hasMessage", true);
+		redirAttrs.addFlashAttribute("class", level.getCode());
+		redirAttrs.addFlashAttribute("message", message);
+	
+	}
+	
+	private void displayMessageForwardHelper(
+			MessageAlertLevel level,
+			String message,
+			Model model) {
+		
+		model.addAttribute("hasMessage", true);
+		model.addAttribute("class", level.getCode());
+		model.addAttribute("message", message);
+	
+	}
 
 }
