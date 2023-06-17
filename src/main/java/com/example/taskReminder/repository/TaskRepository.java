@@ -3,6 +3,7 @@ package com.example.taskReminder.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 import com.example.taskReminder.entity.Task;
 
@@ -13,7 +14,7 @@ public interface TaskRepository extends JpaRepository <Task, Long> {
 	@Query(value = "select * from tasks "
 			+ "where user_id = ?1 and deleted = '0';",
 			nativeQuery = true)
-	Iterable<Task> myFindByUserId(Long userId);
+	List<Task> myFindByUserId(Long userId);
 
 	@Query(value = "select count(*) from tasks "
 			+ "where user_id = ?1 and deleted = '0';",

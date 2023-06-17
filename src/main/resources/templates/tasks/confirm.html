@@ -4,24 +4,58 @@
 </head>
 <body>
 	<div layout:fragment="contents">
+		<div class="py-5 text-center">
+			<h2 th:text="#{A0002_confirm_title}">この内容で本当に続けられるのですね？</h2>
+		</div>
+
+		<div class="container-signin d-grid gap-3">
+
+			<form th:object="${taskForm}" method="post" class="form-horizontal" th:action="@{/create}">
+				<div class="d-grid gap-5">
+
+					<div class="card">
+						<div class="card-header">追加するタスク</div>
+						<div class="card-body">
+							<h5 class="card-title">タスク名：</h5>
+							<p class="card-text" th:text="*{name}"></p>
+							<h5 class="card-title">想定負荷：</h5>
+							<p class="card-text" th:text="*{load}"></p>
+							<h5 class="card-title">意気込み：</h5>
+							<p class="card-text" th:text="*{content}"></p>
+
+							<input type="hidden" th:field="*{name}" />
+							<input type="hidden" th:field="*{load}" />
+							<input type="hidden" th:field="*{content}" />
+							<input type="hidden" th:field="*{taskId}" />
+						</div>
+					</div>
+
+					<div class="d-grid gap-3">
+						<input type="submit" class="btn btn-primary btn-lg" th:value="#{A0002_add_task_button}" />
+						<input type="submit" class="btn btn-secondary btn-lg" name="redo" th:value="#{SYSCOMMON.back_button}" />
+					</div>
+				</div>
+			</form>
+
+		</div>
+
+<!-- 
 		<div class="container">
 			<h1>Confirm</h1>
 			<form th:object="${taskForm}" method="post" class="form-horizontal" th:action="@{/create}">
-				
+
 				<div class="mb-3">
-					<label class="form-label" th:text="#{A0002_task_name_input_label}">郢ｧ�ｽｿ郢ｧ�ｽｹ郢ｧ�ｽｯ陷ｷ�ｿｽ</label> 
-					<span class="text-danger" th:errors=*{name}></span>
-					<span th:text="*{name}"></span>
+					<label class="form-label" th:text="#{A0002_task_name_input_label}">驛｢�ｽｧ�ｿｽ�ｽｽ�ｽｿ驛｢�ｽｧ�ｿｽ�ｽｽ�ｽｹ驛｢�ｽｧ�ｿｽ�ｽｽ�ｽｯ髯ｷ�ｽｷ�ｿｽ�ｽｿ�ｽｽ</label> <span class="text-danger" th:errors=*{name}></span> <span
+						th:text="*{name}"></span>
 					<input type="hidden" th:field="*{name}" />
 				</div>
 				<div class="mb-3">
-					<label class="form-label" th:text="#{A0002_task_load_input_label}">髮具ｿｽ髣包ｽｷ</label> 
-					<span th:text="*{load}"></span>
+					<label class="form-label" th:text="#{A0002_task_load_input_label}">鬮ｮ蜈ｷ�ｽｿ�ｽｽ鬮｣蛹��ｽｽ�ｽｷ</label> <span th:text="*{load}"></span>
 					<input type="hidden" th:field="*{load}" />
 				</div>
 				<div class="mb-3">
-					<label class="form-label" th:text="#{A0002_task_content_input_label}">隲｢荵暦ｽｰ闍難ｽｾ�ｽｼ邵ｺ�ｽｿ</label> <span class="text-danger" th:errors=*{content}></span>
-					<span th:text="*{content}"></span>
+					<label class="form-label" th:text="#{A0002_task_content_input_label}">髫ｲ�ｽ｢闕ｵ證ｦ�ｽｽ�ｽｰ髣埼屮�ｽｽ�ｽｾ�ｿｽ�ｽｽ�ｽｼ驍ｵ�ｽｺ�ｿｽ�ｽｽ�ｽｿ</label> <span class="text-danger" th:errors=*{content}></span> <span
+						th:text="*{content}"></span>
 					<input type="hidden" th:field="*{content}" />
 				</div>
 				<input type="hidden" th:field="*{taskId}" />
@@ -29,6 +63,8 @@
 				<input type="submit" class="btn btn-primary btn-lg" th:value="#{A0002_add_task_button}" />
 			</form>
 		</div>
+-->
+
 	</div>
 </body>
 </html>

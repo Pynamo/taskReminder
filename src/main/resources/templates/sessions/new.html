@@ -4,20 +4,34 @@
 </head>
 <body>
 	<div layout:fragment="contents">
-		<div class="container">
-			<h1>Login</h1>
+		<div class="py-5 text-center">
+			<h2>蟆上＆縺ｪ縺薙→縺ｧ繧ゅ＞縺�縺九ｉ邯壹¢縺ｾ縺励ｇ縺�</h2>
+			<p class="lead">繧�繧九→縺�縺｣縺溘¢縺ｩ縲∽ｸｭ縲�邯壹°縺ｪ縺�繝ｩ繝ｳ繝九Φ繧ｰ縲ゆｸ画律蝮贋ｸｻ縺ｧ邨ゅｏ繧玖ｪｭ譖ｸ縲４NS繧偵▽縺ｶ繧�縺上�ｮ繧る擇蛟偵￥縺輔＞縲�<br>縺昴ｓ縺ｪ譎ゅ�ｯ險倬鹸繧貞叙縺｣縺ｦ縲√ｄ縺｣縺溘％縺ｨ繧呈険繧願ｿ斐ｍ縺�縲ゅ∪縺壹�ｯ莉頑律縺九ｉ�ｼ�</p>
+		</div>
+
+		<div class="container-signin d-grid gap-3">
 			<form th:object="${userForm}" method="post" class="form-horizontal" th:action="@{/login}">
-				<div class="mb-3">
-					<label class="form-label" th:text="#{A0008_user_email_input_label}">Email</label> 
-					<input type="text" class="form-control" name="username">
+				<div class="d-grid gap-3">
+					<div class="text-center">
+						<img class="mb-4" th:src="@{images/login_img.png}" alt="" width="200" height="200">
+					</div>
+					<div class="form-floating">
+						<input type="email" class="form-control" name="username" id="floatingInput" placeholder="name@example.com">
+						<label for="floatingInput">E繝｡繝ｼ繝ｫ</label>
+					</div>
+					<div class="form-floating">
+						<input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
+						<label for="floatingPassword">繝代せ繝ｯ繝ｼ繝�</label>
+					</div>
+					<input type="submit" class="w-100 btn btn-lg btn-primary" name="confirm" th:value="#{A0008_login_button}" />
 				</div>
-				<div class="mb-3">
-					<label class="form-label" th:text="#{A0008_user_password_input_label}">パスワード</label> 
-					<input type="password" class="form-control" name="password">
-				</div>
-				<input type="submit" class="btn btn-primary btn-lg" name="confirm" th:value="#{A0008_login_button}" />
+			</form>
+
+			<form method="get" class="form-horizontal" th:action="@{/users/new}">
+				<input type="submit" class="w-100 btn btn-lg btn-secondary" th:value="#{A0008_new_user_create_button}" />
 			</form>
 		</div>
+
 	</div>
 </body>
 </html>

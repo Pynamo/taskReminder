@@ -26,6 +26,8 @@ public class TaskForm implements Serializable {
     
     private String status;
     
+    private Integer numberOfExecution;
+    
     private UserForm user;
 
 }

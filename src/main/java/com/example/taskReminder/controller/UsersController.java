@@ -14,6 +14,9 @@ import com.example.taskReminder.form.UserForm;
 import com.example.taskReminder.service.UserService;
 import com.example.taskReminder.validation.PasswordEqualsValidator;
 
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
+
 @Controller
 public class UsersController {
 	
@@ -27,12 +30,14 @@ public class UsersController {
         binder.addValidators(passwordEqualsValidator);
     }	
     
+    @TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@GetMapping(path = "/users/new")
     public String createForm(Model model) {
         model.addAttribute("userForm", new UserForm());
         return "users/new";
     }
 
+    @TransactionTokenCheck
 	@PostMapping(path = "/users/create")
 	public String create(
 			@Validated UserForm userForm,

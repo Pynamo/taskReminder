@@ -5,7 +5,9 @@ import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.example.taskReminder.common.Load;
 import com.example.taskReminder.common.MessageAlertLevel;
@@ -27,11 +30,11 @@ import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
 
-//import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
-//import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
 
 @Controller
-//@TransactionTokenCheck("transactionTokenCheck")
+@TransactionTokenCheck("tasks")
 public class TasksController {
 	
 	protected static Logger log = LoggerFactory.getLogger(TasksController.class);
@@ -46,11 +49,14 @@ public class TasksController {
 
 	@Autowired
 	private TaskService taskService;
+	@Autowired
+	private MessageSource messages;
 
 	/**
 	 * タスク一覧表示
 	 * タスクが一つも登録されていない場合はResourceNotFoundException発生
 	 */
+	//@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@GetMapping
 	public String list(
 			Principal principal,
@@ -93,7 +99,7 @@ public class TasksController {
 	/**
 	 * 新規作成内容の確認
 	 */
-	//@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
+	@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@PostMapping(value="/create", params="confirm")
 	public String createConfirm(
 			@Validated TaskForm taskForm,
@@ -130,7 +136,7 @@ public class TasksController {
 	 * タスクを作成
 	 * タスクが既に3つ以上登録されていた場合はBuisinessException発生
 	 */
-	//@TransactionTokenCheck(type = TransactionTokenType.IN)
+	@TransactionTokenCheck
 	@PostMapping(value="/create")
 	public String create(
 			@Validated TaskForm taskForm,
@@ -155,22 +161,19 @@ public class TasksController {
 	    	return "redirect:/";
         }
         
-		return "redirect:/create?complete";		
-	}
-	
-	/**
-	 * 登録完了時の画面表示
-	 */
-	@GetMapping(value="/create", params="complete")
-	public String createComplete() {
-
-		return "tasks/complete";
+        displayMessageRedirectHelper(
+				MessageAlertLevel.SUCCESS, 
+				"新しいタスクを登録しました。頑張って習慣化しましょう！", 
+				redirAttrs);
+        
+		return "redirect:/";		
 	}
 	
 	/**
 	 * 削除画面呼び出し
 	 * タスクが一つも登録されていない時はResouceNotFoundException発生
 	 */
+	//@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@GetMapping(value="/delete", params="form")
 	public String deleteList(
 			Principal principal,
@@ -199,6 +202,7 @@ public class TasksController {
 	 * 削除対象が存在しない時はResouceNotFoundException発生
 	 * 削除対象が既に削除されている時はSystemException発生
 	 */
+	//@TransactionTokenCheck
 	@PostMapping(value="/delete")
 	public String delete(
 			@RequestParam("task_id") long taskId, 
@@ -275,6 +279,9 @@ public class TasksController {
 		}
 
 		TaskForm taskForm = TaskMapper.INSTANCE.taskToForm(task);
+		
+		//String message = messages.getMessage("A0006_title", new String[] {task.getName()}, locale);
+		
 		model.addAttribute("taskForm", taskForm);
 		
 		return "tasks/detail";

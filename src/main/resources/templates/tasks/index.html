@@ -4,41 +4,80 @@
 </head>
 <body>
 	<div layout:fragment="contents">
+		<div class="py-5 text-center">
+			<h2 th:text="#{A0001_title}">あなたのタスク一覧です</h2>
+			<p class="lead" th:text="#{A0001_subtitle}">毎日タスクを実行し、完了ボタンを押すことで日々の積み重ねが記録されていきます。登録できるタスクはたったの3つです。成果は期待しすぎず、まずは続けてみましょう。</p>
+		</div>
 
-		<!-- 新規作成画面遷移フォーム -->
-		<form method="get" class="form-horizontal" th:action="@{/create}">
-			<input type="submit" class="btn btn-primary btn-lg" name="form" th:value="#{A0001_add_task_button}" />
-		</form>
-		
-		<!-- 削除画面遷移フォーム -->
-		<form method="get" class="form-horizontal" th:action="@{/delete}">
-			<input type="submit" class="btn btn-danger btn-lg" name="form" th:value="#{A0001_delete_task_button}" />
-		</form>
 
-		<!-- 登録済タスク一覧 -->
-		<div th:each="item : ${list}">
-			<div class="card">
-				<h5 class="card-header" th:text="${item.name}"></h5>
-				<div class="card-body">
-					<h5 class="card-title" th:text="${item.content}"></h5>
-					<p class="card-text" th:text="${item.userId}"></p>
-					
-					<!-- タスク実行フォーム -->
-					<form method="post" class="form-horizontal" th:action="@{/execute}">
-						<input type="hidden" name="task_id" th:value="${item.taskId}" />
-						<input type="submit" class="btn btn-primary" th:value="タスク完了" />
-					</form>
-					
-					<!-- タスク変更、詳細画面遷移フォーム -->
-					<form method="get" class="form-horizontal" th:action="@{/task}">
-						<input type="hidden" name="task_id" th:value="${item.taskId}" />
-						<input type="submit" class="btn btn-outline-primary" name="update" th:value="変更" />
-						<input type="submit" class="btn btn-outline-success" name="detail" th:value="詳細" />
-					</form>
+
+		<section class="text-center container">
+			<div class="col-lg-5 col-md-8 mx-auto">
+				<div class="row">
+					<div class="col-6 mx-auto">
+						<!-- タスク追加フォーム -->
+						<form method="get" class="form-horizontal" th:action="@{/create}">
+							<input type="submit" class="btn btn-success btn-lg" name="form" th:value="#{A0001_add_task_button}" />
+						</form>
+					</div>
+
+					<div class="col-6 mx-auto">
+						<!-- タスク削除フォーム -->
+						<form method="get" class="form-horizontal" th:action="@{/delete}">
+							<input type="submit" class="btn btn-danger btn-lg" name="form" th:value="#{A0001_delete_task_button}" />
+						</form>
+					</div>
+
+				</div>
+			</div>
+		</section>
+
+		<div class="album py-5">
+			<div class="container">
+				<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+					<div th:each="item : ${list}">
+						<div class="col">
+							<div class="card shadow-sm">
+								<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice"
+									focusable="false">
+									<rect width="100%" height="100%" fill="#55595c" />
+								</svg>
+
+								<div class="card-body">
+									<h5 class="card-title" th:text="${item.name}"></h5>
+									<p class="card-text" th:text="${item.content}"></p>
+									<div class="d-flex flex-column justify-content-between align-items-left">
+									
+										<form method="post" class="form-horizontal" th:action="@{/execute}">
+											<input type="hidden" name="task_id" th:value="${item.taskId}" />
+											
+											<div th:if="${item.status == '0'}">
+												<input type="submit" class="btn btn-primary" th:value="#{A0001_task_complete_button}" />
+											</div>
+											<div th:unless="${item.status == '0'}">
+												<input type="submit" class="btn btn-secondary" th:value="#{A0001_task_complete_button_disabled}" disabled/>
+											</div>
+										</form>
+
+										<div class="d-flex jusify-content-between align-items-end">
+										
+											<form method="get" class="form-horizontal py-4 flex-grow-1" th:action="@{/task}">
+												<input type="hidden" name="task_id" th:value="${item.taskId}" />
+												<input type="submit" class="btn btn-outline-primary" name="update" th:value="#{A0001_task_edit_button}" />
+												<input type="submit" class="btn btn-outline-success" name="detail" th:value="#{A0001_task_detail_button}" />
+											</form>
+											<small class="text-muted">実行回数：[[${item.numberOfExecution}]]回</small>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-		
+
 	</div>
 </body>
 </html>

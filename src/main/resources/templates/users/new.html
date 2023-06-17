@@ -4,33 +4,111 @@
 </head>
 <body>
 	<div layout:fragment="contents">
-		<div class="container">
-			<h1>New User</h1>
+		<div class="py-5 text-center">
+			<h2>ユーザー登録フォーム</h2>
+		</div>
+
+		<div class="container-signin d-grid gap-3">
+			<form th:object="${userForm}" method="post" class="form-horizontal" th:action="@{/users/create}">
+				<div class="d-grid gap-5">
+
+					<div class="form-floating">
+						<input type="text" class="form-control" th:field="*{name}" id="floatingInput">
+						<label for="floatingInput" th:text="#{A0008_user_name_input_label}">名前</label> 
+						<span class="text-danger" th:errors=*{name}></span>
+					</div>
+
+					<div class="form-floating">
+						<input type="text" class="form-control" th:field="*{email}" id="floatingInput">
+						<label for="floatingInput" th:text="#{A0008_user_email_input_label}">Eメール</label> 
+						<span class="text-danger" th:errors=*{email}></span>
+					</div>
+
+					<div class="form-floating">
+						<input type="password" class="form-control" th:field="*{password}" id="floatingInput">
+						<label for="floatingInput" th:text="#{A0008_user_password_input_label}">パスワード</label> 
+						<span class="text-danger" th:errors=*{password}></span>
+					</div>
+					<div class="form-floating">
+						<input type="password" class="form-control" th:field="*{passwordConfirmation}" id="floatingInput">
+						<label for="floatingInput" th:text="#{A0008_user_password_confirm_label}">パスワード確認</label> 
+						<span class="text-danger" th:errors=*{passwordConfirmation}></span>
+					</div>
+					<input type="submit" class="w-100 btn btn-lg btn-primary" th:value="#{A0008_add_user_button}" />
+				</div>
+			</form>
+
+			<form method="get" class="form-horizontal" th:action="@{/login}">
+				<input type="submit" class="w-100 btn btn-lg btn-secondary" th:value="ログイン画面へ" />
+			</form>
+		</div>
+	</div>
+
+
+
+	<!-- 
+				<div class="py-5 text-center">
+			<h2>蟆上＆縺ｪ縺薙→縺ｧ繧ゅ＞縺�縺九ｉ邯壹¢縺ｾ縺励ｇ縺�</h2>
+			<p class="lead">繧�繧九→縺�縺｣縺溘¢縺ｩ縲∽ｸｭ縲�邯壹°縺ｪ縺�繝ｩ繝ｳ繝九Φ繧ｰ縲ゆｸ画律蝮贋ｸｻ縺ｧ邨ゅｏ繧玖ｪｭ譖ｸ縲４NS繧偵▽縺ｶ繧�縺上�ｮ繧る擇蛟偵￥縺輔＞縲�<br>縺昴ｓ縺ｪ譎ゅ�ｯ險倬鹸繧貞叙縺｣縺ｦ縲√ｄ縺｣縺溘％縺ｨ繧呈険繧願ｿ斐ｍ縺�縲ゅ∪縺壹�ｯ莉頑律縺九ｉ�ｼ�</p>
+		</div>
+
+		<div class="container-signin d-grid gap-3">
+			<form th:object="${userForm}" method="post" class="form-horizontal" th:action="@{/login}">
+				<div class="d-grid gap-3">
+					<div class="text-center">
+						<img class="mb-4" th:src="@{images/login_img.png}" alt="" width="200" height="200">
+					</div>
+					<div class="form-floating">
+						<input type="email" class="form-control" name="username" id="floatingInput" placeholder="name@example.com">
+						<label for="floatingInput">E繝｡繝ｼ繝ｫ</label>
+					</div>
+					<div class="form-floating">
+						<input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
+						<label for="floatingPassword">繝代せ繝ｯ繝ｼ繝�</label>
+					</div>
+					<input type="submit" class="w-100 btn btn-lg btn-primary" name="confirm" th:value="#{A0008_login_button}" />
+				</div>
+			</form>
+
+			<form method="get" class="form-horizontal" th:action="@{/users/new}">
+				<input type="submit" class="w-100 btn btn-lg btn-secondary" th:value="#{A0008_new_user_create_button}" />
+			</form>
+		</div>
+	</div>
+	
+	
+	<div layout:fragment="contents">
+			<div class="py-5 text-center">
+				<h2>ユーザー登録フォーム</h2>
+			</div>
+			<div class="container-signin d-grid gap-3">
 			<form th:object="${userForm}" method="post" class="form-horizontal" th:action="@{/users/create}">
 				
 				<div class="mb-3">
-					<label class="form-label" th:text="#{A0008_user_name_input_label}">ユーザー名</label> 
+					<label class="form-label" th:text="#{A0008_user_name_input_label}">繝ｦ繝ｼ繧ｶ繝ｼ蜷�</label> 
 					<span class="text-danger" th:errors=*{name}></span>
 					<input type="text" class="form-control" th:field="*{name}">
 				</div>
 				<div class="mb-3">
-					<label class="form-label" th:text="#{A0008_user_email_input_label}">メールアドレス</label> 
+					<label class="form-label" th:text="#{A0008_user_email_input_label}">繝｡繝ｼ繝ｫ繧｢繝峨Ξ繧ｹ</label> 
 					<span class="text-danger" th:errors=*{email}></span>
 					<input type="text" class="form-control" th:field="*{email}">
 				</div>
 				<div class="mb-3">
-					<label class="form-label" th:text="#{A0008_user_password_input_label}">パスワード</label> 
+					<label class="form-label" th:text="#{A0008_user_password_input_label}">繝代せ繝ｯ繝ｼ繝�</label> 
 					<span class="text-danger" th:errors=*{password}></span>
 					<input type="password" class="form-control" th:field="*{password}">
 				</div>
 				<div class="mb-3">
-					<label class="form-label" th:text="#{A0008_user_password_confirm_label}">パスワード（確認）</label> 
+					<label class="form-label" th:text="#{A0008_user_password_confirm_label}">繝代せ繝ｯ繝ｼ繝会ｼ育｢ｺ隱搾ｼ�</label> 
 					<span class="text-danger" th:errors=*{passwordConfirmation}></span>
 					<input type="password" class="form-control" th:field="*{passwordConfirmation}">
 				</div>
 				<input type="submit" class="btn btn-primary btn-lg" th:value="#{A0008_add_user_button}" />
 			</form>
-		</div>
+			</div>
 	</div>
+		
+	-->
 </body>
 </html>

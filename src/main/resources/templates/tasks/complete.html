@@ -4,7 +4,10 @@
 </head>
 <body>
 	<div layout:fragment="contents">
-		<h1>Complete</h1>
+		<div class="py-5 text-center">
+			<h2 th:text="#{A0002_complete_title}">習慣化したいタスクを追加しましょう</h2>
+			<p class="lead" th:text="#{A0002_complete_subtitle}">登録できるタスクはたったの3つです。習慣化したいものに絞って取り組みましょう</p>
+		</div>
 		
 		<a class="btn w-100 btn-outline-light" th:href="@{/}">Log in</a>
 

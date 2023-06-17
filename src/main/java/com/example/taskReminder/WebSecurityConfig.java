@@ -26,10 +26,12 @@ public class WebSecurityConfig {
     /**
     * 認証から除外する
     */
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
-        return (web) -> web.ignoring().antMatchers(URLS);
+        return web -> web.ignoring().antMatchers(URLS);
     }
+    
     
     /**
      * 認証を設定する
@@ -64,7 +66,7 @@ public class WebSecurityConfig {
 		    )
 		    .authorizeHttpRequests(authz -> authz
 		    // CSS等の静的ファイルはログインなしでもアクセス可能
-            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+            //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
             // ここで指定したURLにはログインなしでもアクセス可能
       		.antMatchers("/login", "/logout-complete", "/users/new", "/users/create", "/user", "/h2-console").permitAll()				
             .anyRequest().authenticated()
