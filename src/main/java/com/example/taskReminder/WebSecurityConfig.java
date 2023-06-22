@@ -26,12 +26,10 @@ public class WebSecurityConfig {
     /**
     * 認証から除外する
     */
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
         return web -> web.ignoring().antMatchers(URLS);
     }
-    
     
     /**
      * 認証を設定する
@@ -53,7 +51,7 @@ public class WebSecurityConfig {
 			// ログアウトをトリガーするURL
 		  	.logout(logout -> logout.logoutUrl("/logout")
 		  	// ログアウト成功時のリダイレクト先URL		
-		    .logoutSuccessUrl("/logout-complete")
+		    .logoutSuccessUrl("/login")
 		    // ログアウト時に認証情報をクリア
 		    .clearAuthentication(true)
 		    // ログアウト成功時に削除するCookie名を指定
@@ -68,7 +66,7 @@ public class WebSecurityConfig {
 		    // CSS等の静的ファイルはログインなしでもアクセス可能
             //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
             // ここで指定したURLにはログインなしでもアクセス可能
-      		.antMatchers("/login", "/logout-complete", "/users/new", "/users/create", "/user", "/h2-console").permitAll()				
+      		.antMatchers("/login", "/logout-complete", "/users/new", "/users/create", "/user", "/h2-console", "/css/**").permitAll()				
             .anyRequest().authenticated()
             )
 		    .authenticationProvider(authenticationProvider);

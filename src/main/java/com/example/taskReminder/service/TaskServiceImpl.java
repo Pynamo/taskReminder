@@ -16,10 +16,13 @@ import com.example.taskReminder.entity.Task;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
+import com.example.taskReminder.exception.SystemException;
 import com.example.taskReminder.form.TaskForm;
 import com.example.taskReminder.mapper.TaskMapper;
 import com.example.taskReminder.repository.TaskExecutionHistoryRepository;
 import com.example.taskReminder.repository.TaskRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -31,9 +34,7 @@ public class TaskServiceImpl implements TaskService {
 	@Autowired
     TaskExecutionHistoryRepository taskExecutionHistoryRepository;
 	
-	// TODO 最大値に指定できる値の範囲を指定したい場合はどうすれば？
-	// TODO 書き換えられてしまうのでは？
-	@Value("${max.registration:5}")
+	@Value("${max.registration:5}") 
 	private int max_registration;
 
 	/**
@@ -56,9 +57,10 @@ public class TaskServiceImpl implements TaskService {
 	/**
 	 * 登録済タスク一覧取得
 	 * タスクがひとつも登録されていない場合はResourceNotFoundExceptionを投げる
+	 * @throws SystemException 
 	 */
 	@Override
-	public List<Task> getTaskList(Long userId) throws ResourceNotFoundException {
+	public List<Task> getTaskList(Long userId) throws ResourceNotFoundException, SystemException {
 		
 		List<Task> tasks = taskRepository.myFindByUserId(userId);
 		if(Objects.isNull(tasks)) {
@@ -70,11 +72,16 @@ public class TaskServiceImpl implements TaskService {
 		// タスク実行履歴テーブルから過去の実行回数を取得し、nullでなければTaskエンティティに追加する
 		for(Task data : tasks) {
 			
-			int numberOfExecution = taskExecutionHistoryRepository.countByTaskId(data.getTaskId());
+			int numberOfExecution = 0;
 			
-			if(Objects.nonNull(numberOfExecution)) {
-				data.setNumberOfExecution(numberOfExecution);
+			try {
+				numberOfExecution = taskExecutionHistoryRepository.countByTaskId(data.getTaskId());
+			} catch(NullPointerException e) {
+				throw new SystemException("");
 			}
+			
+			data.setNumberOfExecution(numberOfExecution);
+			
 			list.add(data);
 		}
 		

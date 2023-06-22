@@ -5,8 +5,8 @@
 <body>
 	<div layout:fragment="contents">
 		<div class="py-5 text-center">
-			<h2 th:text="#{A0001_title}">あなたのタスク一覧です</h2>
-			<p class="lead" th:text="#{A0001_subtitle}">毎日タスクを実行し、完了ボタンを押すことで日々の積み重ねが記録されていきます。登録できるタスクはたったの3つです。成果は期待しすぎず、まずは続けてみましょう。</p>
+			<h2 th:text="#{A0001_title}"></h2>
+			<p class="lead" th:text="#{A0001_subtitle}">日本語</p>
 		</div>
 
 
@@ -15,14 +15,14 @@
 			<div class="col-lg-5 col-md-8 mx-auto">
 				<div class="row">
 					<div class="col-6 mx-auto">
-						<!-- タスク追加フォーム -->
+						<!-- 繧ｿ繧ｹ繧ｯ霑ｽ蜉�繝輔か繝ｼ繝� -->
 						<form method="get" class="form-horizontal" th:action="@{/create}">
 							<input type="submit" class="btn btn-success btn-lg" name="form" th:value="#{A0001_add_task_button}" />
 						</form>
 					</div>
 
 					<div class="col-6 mx-auto">
-						<!-- タスク削除フォーム -->
+						<!-- 繧ｿ繧ｹ繧ｯ蜑企勁繝輔か繝ｼ繝� -->
 						<form method="get" class="form-horizontal" th:action="@{/delete}">
 							<input type="submit" class="btn btn-danger btn-lg" name="form" th:value="#{A0001_delete_task_button}" />
 						</form>
@@ -50,7 +50,6 @@
 									
 										<form method="post" class="form-horizontal" th:action="@{/execute}">
 											<input type="hidden" name="task_id" th:value="${item.taskId}" />
-											
 											<div th:if="${item.status == '0'}">
 												<input type="submit" class="btn btn-primary" th:value="#{A0001_task_complete_button}" />
 											</div>
@@ -66,7 +65,7 @@
 												<input type="submit" class="btn btn-outline-primary" name="update" th:value="#{A0001_task_edit_button}" />
 												<input type="submit" class="btn btn-outline-success" name="detail" th:value="#{A0001_task_detail_button}" />
 											</form>
-											<small class="text-muted">実行回数：[[${item.numberOfExecution}]]回</small>
+											<small class="text-muted">実行回数: [[${item.numberOfExecution}]]回</small>
 										</div>
 									</div>
 								</div>

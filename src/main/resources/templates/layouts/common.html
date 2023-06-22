@@ -6,7 +6,10 @@
 		<div class="container-fluid">
 			<a class="navbar-brand" href="#" th:text="#{SYSCOMMON.title}"></a>
 			<div class="d-flex align-items-end" id="navbarCollapse">
-				<a class="btn btn-outline-danger" href="#">Logout</a>
+				<form method="post" th:action="@{/logout}">
+					<input type="submit" class="btn btn-outline-danger" th:value="Logout" onclick="return confirm('ログアウトしてもいいですか？')"/>
+					
+				</form>
 			</div>
 		</div>
 	</nav>

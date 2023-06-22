@@ -29,5 +29,7 @@ public class TaskForm implements Serializable {
     private Integer numberOfExecution;
     
     private UserForm user;
+    
+    private boolean selected;
 
 }

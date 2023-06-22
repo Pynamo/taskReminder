@@ -19,16 +19,19 @@ import org.springframework.security.core.Authentication;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import com.example.taskReminder.common.Load;
 import com.example.taskReminder.common.MessageAlertLevel;
 import com.example.taskReminder.form.TaskForm;
+import com.example.taskReminder.form.TaskFormList;
 import com.example.taskReminder.mapper.TaskMapper;
 import com.example.taskReminder.service.TaskService;
 import com.example.taskReminder.entity.Task;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
+import com.example.taskReminder.exception.SystemException;
 
 import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
 import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
@@ -72,6 +75,8 @@ public class TasksController {
         	
         } catch(ResourceNotFoundException e) {
         	// TODO 画面にメッセージを出力する
+        } catch(SystemException e) {
+        	// TODO システム例外IDを画面に表示する
         }
         
         List<TaskForm> list = new ArrayList<>();
@@ -155,7 +160,7 @@ public class TasksController {
         	log.error("Task is full!");
         	displayMessageRedirectHelper(
 					MessageAlertLevel.ERROR, 
-					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう", 
+					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう",  // TODO 変数埋め込み
 					redirAttrs);
 	    	
 	    	return "redirect:/";
@@ -182,17 +187,23 @@ public class TasksController {
 		Authentication authentication = (Authentication) principal;
         UserInf user = (UserInf) authentication.getPrincipal();
         
-        Iterable<Task> tasks = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
         
         try {
         	tasks = taskService.getTaskList(user.getUserId());
         } catch(ResourceNotFoundException e) {
         	// TODO 削除対象が見つからない時はエラーメッセージ表示
+        } catch(SystemException e) {
+        	// TODO システム例外IDを表示
         }
         
+        TaskFormList taskFormList = new TaskFormList();
         List<TaskForm> list = new ArrayList<>();
         list = TaskMapper.INSTANCE.tasksToTaskForm(tasks);
-        model.addAttribute("list", list);		
+        
+        taskFormList.setTaskFormList(list);
+        
+        model.addAttribute("list", taskFormList);
         
 		return "tasks/delete";
 	}
@@ -203,6 +214,7 @@ public class TasksController {
 	 * 削除対象が既に削除されている時はSystemException発生
 	 */
 	//@TransactionTokenCheck
+	/*
 	@PostMapping(value="/delete")
 	public String delete(
 			@RequestParam("task_id") long taskId, 
@@ -227,6 +239,76 @@ public class TasksController {
 		
 		return "redirect:/delete?form";
 	}
+	*/
+	
+	
+	@PostMapping(value="/delete")
+	public String deleteSelected(
+			TaskFormList taskFormList,
+			Principal principal,
+			RedirectAttributes redirAttrs
+			) {
+		
+		
+		if(Objects.isNull(taskFormList.getTaskFormList())) {
+			displayMessageRedirectHelper(
+					MessageAlertLevel.WARNING, 
+					"タスクが存在しません", 
+					redirAttrs);
+			return "redirect:/delete?form";
+		}
+	
+		
+		int counter = 0;
+		
+		for(TaskForm taskForm : taskFormList.getTaskFormList()) {
+			
+			if(taskForm.isSelected()) {
+				
+				counter += 1;
+				
+				try {
+					
+					taskService.deleteTask(taskForm.getTaskId());
+					
+				} catch(ResourceNotFoundException e) {
+					
+					log.error("Task not found!");
+					displayMessageRedirectHelper(
+							MessageAlertLevel.ERROR, 
+							"削除する対象が見つかりません", 
+							redirAttrs);
+					return "redirect:/delete?form";
+					
+				} catch(BusinessException e) {
+					
+					log.error("Task is deleted!");
+					displayMessageRedirectHelper(
+							MessageAlertLevel.ERROR, 
+							"対象は既に削除されています", 
+							redirAttrs);
+					return "redirect:/delete?form";
+					
+				}
+			}
+		}
+		
+		if(counter == 0) {
+			displayMessageRedirectHelper(
+					MessageAlertLevel.WARNING, 
+					"削除するタスクを選択してください", 
+					redirAttrs);
+		} else {
+			displayMessageRedirectHelper(
+					MessageAlertLevel.SUCCESS, 
+					"タスクを削除しました！さあ次は何をはじめますか？", 
+					redirAttrs);
+		}
+
+		
+		return "redirect:/delete?form";
+	}
+	
 	
 	/**
 	 * タスク内容の更新（タスクを取得し、新規作成時と同じhtmlのフォームに値を詰める）
