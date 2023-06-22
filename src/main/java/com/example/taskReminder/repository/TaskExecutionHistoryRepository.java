@@ -10,5 +10,10 @@ import com.example.taskReminder.entity.TasksExecutionHistory;
 @Repository
 public interface TaskExecutionHistoryRepository extends JpaRepository <TasksExecutionHistory, Long> {
 
-
+	/*
+	@Query(value = "select count(*) from taskExecutionHistory "
+			+ "where task_id = ?1;",
+			nativeQuery = true)
+	*/
+	Integer countByTaskId(Long taskId);
 }

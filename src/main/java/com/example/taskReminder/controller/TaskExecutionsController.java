@@ -13,6 +13,10 @@ import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.SystemException;
 import com.example.taskReminder.service.TaskExecuteService;
 import com.example.taskReminder.service.TaskService;
+
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
+
 import com.example.taskReminder.common.MessageAlertLevel;
 
 @Controller
@@ -29,6 +33,7 @@ public class TaskExecutionsController {
 	 * タスク実行処理
 	 * タスクが既に実行済であればSystemException発生
 	 */
+	@TransactionTokenCheck
 	@PostMapping(value="/execute")
 	public String execute(
 			@RequestParam("task_id") long taskId, 
@@ -37,7 +42,7 @@ public class TaskExecutionsController {
 		
 		try {
 			taskExecuteService.execute(taskId);
-			log.error("execute!");
+			log.info("execute!");
 			displayMessageRedirectHelper(
 					MessageAlertLevel.SUCCESS, 
 					"実行しました", 

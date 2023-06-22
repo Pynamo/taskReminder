@@ -8,15 +8,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.ArrayList;
 
 import com.example.taskReminder.common.Delete;
 import com.example.taskReminder.entity.Task;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
+import com.example.taskReminder.exception.SystemException;
 import com.example.taskReminder.form.TaskForm;
 import com.example.taskReminder.mapper.TaskMapper;
+import com.example.taskReminder.repository.TaskExecutionHistoryRepository;
 import com.example.taskReminder.repository.TaskRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -25,10 +31,10 @@ public class TaskServiceImpl implements TaskService {
 
 	@Autowired
     TaskRepository taskRepository;
+	@Autowired
+    TaskExecutionHistoryRepository taskExecutionHistoryRepository;
 	
-	// TODO 最大値の範囲を指定したい場合はどうすれば？
-	// TODO 書き換えられてしまうのでは？
-	@Value("${max.registration:5}")
+	@Value("${max.registration:5}") 
 	private int max_registration;
 
 	/**
@@ -51,16 +57,35 @@ public class TaskServiceImpl implements TaskService {
 	/**
 	 * 登録済タスク一覧取得
 	 * タスクがひとつも登録されていない場合はResourceNotFoundExceptionを投げる
-	 * TODO 型をListに変更する
+	 * @throws SystemException 
 	 */
 	@Override
-	public Iterable<Task> getTaskList(Long userId) throws ResourceNotFoundException {
+	public List<Task> getTaskList(Long userId) throws ResourceNotFoundException, SystemException {
 		
-		Iterable<Task> tasks = taskRepository.myFindByUserId(userId);
+		List<Task> tasks = taskRepository.myFindByUserId(userId);
 		if(Objects.isNull(tasks)) {
 			throw new ResourceNotFoundException("Task not found!");
 		}
-		return tasks;
+		
+		List<Task> list = new ArrayList<Task>();
+		
+		// タスク実行履歴テーブルから過去の実行回数を取得し、nullでなければTaskエンティティに追加する
+		for(Task data : tasks) {
+			
+			int numberOfExecution = 0;
+			
+			try {
+				numberOfExecution = taskExecutionHistoryRepository.countByTaskId(data.getTaskId());
+			} catch(NullPointerException e) {
+				throw new SystemException("");
+			}
+			
+			data.setNumberOfExecution(numberOfExecution);
+			
+			list.add(data);
+		}
+		
+		return list;
 	}
 
 	/**

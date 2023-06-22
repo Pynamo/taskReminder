@@ -5,7 +5,9 @@ import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -16,22 +18,26 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import com.example.taskReminder.common.Load;
 import com.example.taskReminder.common.MessageAlertLevel;
 import com.example.taskReminder.form.TaskForm;
+import com.example.taskReminder.form.TaskFormList;
 import com.example.taskReminder.mapper.TaskMapper;
 import com.example.taskReminder.service.TaskService;
 import com.example.taskReminder.entity.Task;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
+import com.example.taskReminder.exception.SystemException;
 
-//import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
-//import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
 
 @Controller
-//@TransactionTokenCheck("transactionTokenCheck")
+@TransactionTokenCheck("tasks")
 public class TasksController {
 	
 	protected static Logger log = LoggerFactory.getLogger(TasksController.class);
@@ -46,11 +52,14 @@ public class TasksController {
 
 	@Autowired
 	private TaskService taskService;
+	@Autowired
+	private MessageSource messages;
 
 	/**
 	 * タスク一覧表示
 	 * タスクが一つも登録されていない場合はResourceNotFoundException発生
 	 */
+	//@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@GetMapping
 	public String list(
 			Principal principal,
@@ -66,6 +75,8 @@ public class TasksController {
         	
         } catch(ResourceNotFoundException e) {
         	// TODO 画面にメッセージを出力する
+        } catch(SystemException e) {
+        	// TODO システム例外IDを画面に表示する
         }
         
         List<TaskForm> list = new ArrayList<>();
@@ -93,7 +104,7 @@ public class TasksController {
 	/**
 	 * 新規作成内容の確認
 	 */
-	//@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
+	@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@PostMapping(value="/create", params="confirm")
 	public String createConfirm(
 			@Validated TaskForm taskForm,
@@ -130,7 +141,7 @@ public class TasksController {
 	 * タスクを作成
 	 * タスクが既に3つ以上登録されていた場合はBuisinessException発生
 	 */
-	//@TransactionTokenCheck(type = TransactionTokenType.IN)
+	@TransactionTokenCheck
 	@PostMapping(value="/create")
 	public String create(
 			@Validated TaskForm taskForm,
@@ -149,28 +160,25 @@ public class TasksController {
         	log.error("Task is full!");
         	displayMessageRedirectHelper(
 					MessageAlertLevel.ERROR, 
-					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう", 
+					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう",  // TODO 変数埋め込み
 					redirAttrs);
 	    	
 	    	return "redirect:/";
         }
         
-		return "redirect:/create?complete";		
-	}
-	
-	/**
-	 * 登録完了時の画面表示
-	 */
-	@GetMapping(value="/create", params="complete")
-	public String createComplete() {
-
-		return "tasks/complete";
+        displayMessageRedirectHelper(
+				MessageAlertLevel.SUCCESS, 
+				"新しいタスクを登録しました。頑張って習慣化しましょう！", 
+				redirAttrs);
+        
+		return "redirect:/";		
 	}
 	
 	/**
 	 * 削除画面呼び出し
 	 * タスクが一つも登録されていない時はResouceNotFoundException発生
 	 */
+	//@TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@GetMapping(value="/delete", params="form")
 	public String deleteList(
 			Principal principal,
@@ -179,17 +187,23 @@ public class TasksController {
 		Authentication authentication = (Authentication) principal;
         UserInf user = (UserInf) authentication.getPrincipal();
         
-        Iterable<Task> tasks = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
         
         try {
         	tasks = taskService.getTaskList(user.getUserId());
         } catch(ResourceNotFoundException e) {
         	// TODO 削除対象が見つからない時はエラーメッセージ表示
+        } catch(SystemException e) {
+        	// TODO システム例外IDを表示
         }
         
+        TaskFormList taskFormList = new TaskFormList();
         List<TaskForm> list = new ArrayList<>();
         list = TaskMapper.INSTANCE.tasksToTaskForm(tasks);
-        model.addAttribute("list", list);		
+        
+        taskFormList.setTaskFormList(list);
+        
+        model.addAttribute("list", taskFormList);
         
 		return "tasks/delete";
 	}
@@ -199,6 +213,8 @@ public class TasksController {
 	 * 削除対象が存在しない時はResouceNotFoundException発生
 	 * 削除対象が既に削除されている時はSystemException発生
 	 */
+	//@TransactionTokenCheck
+	/*
 	@PostMapping(value="/delete")
 	public String delete(
 			@RequestParam("task_id") long taskId, 
@@ -223,6 +239,76 @@ public class TasksController {
 		
 		return "redirect:/delete?form";
 	}
+	*/
+	
+	
+	@PostMapping(value="/delete")
+	public String deleteSelected(
+			TaskFormList taskFormList,
+			Principal principal,
+			RedirectAttributes redirAttrs
+			) {
+		
+		
+		if(Objects.isNull(taskFormList.getTaskFormList())) {
+			displayMessageRedirectHelper(
+					MessageAlertLevel.WARNING, 
+					"タスクが存在しません", 
+					redirAttrs);
+			return "redirect:/delete?form";
+		}
+	
+		
+		int counter = 0;
+		
+		for(TaskForm taskForm : taskFormList.getTaskFormList()) {
+			
+			if(taskForm.isSelected()) {
+				
+				counter += 1;
+				
+				try {
+					
+					taskService.deleteTask(taskForm.getTaskId());
+					
+				} catch(ResourceNotFoundException e) {
+					
+					log.error("Task not found!");
+					displayMessageRedirectHelper(
+							MessageAlertLevel.ERROR, 
+							"削除する対象が見つかりません", 
+							redirAttrs);
+					return "redirect:/delete?form";
+					
+				} catch(BusinessException e) {
+					
+					log.error("Task is deleted!");
+					displayMessageRedirectHelper(
+							MessageAlertLevel.ERROR, 
+							"対象は既に削除されています", 
+							redirAttrs);
+					return "redirect:/delete?form";
+					
+				}
+			}
+		}
+		
+		if(counter == 0) {
+			displayMessageRedirectHelper(
+					MessageAlertLevel.WARNING, 
+					"削除するタスクを選択してください", 
+					redirAttrs);
+		} else {
+			displayMessageRedirectHelper(
+					MessageAlertLevel.SUCCESS, 
+					"タスクを削除しました！さあ次は何をはじめますか？", 
+					redirAttrs);
+		}
+
+		
+		return "redirect:/delete?form";
+	}
+	
 	
 	/**
 	 * タスク内容の更新（タスクを取得し、新規作成時と同じhtmlのフォームに値を詰める）
@@ -275,6 +361,9 @@ public class TasksController {
 		}
 
 		TaskForm taskForm = TaskMapper.INSTANCE.taskToForm(task);
+		
+		//String message = messages.getMessage("A0006_title", new String[] {task.getName()}, locale);
+		
 		model.addAttribute("taskForm", taskForm);
 		
 		return "tasks/detail";

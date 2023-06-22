@@ -9,10 +9,15 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.taskReminder.common.MessageAlertLevel;
 import com.example.taskReminder.form.UserForm;
 import com.example.taskReminder.service.UserService;
 import com.example.taskReminder.validation.PasswordEqualsValidator;
+
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
+import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
 
 @Controller
 public class UsersController {
@@ -37,6 +42,7 @@ public class UsersController {
 	public String create(
 			@Validated UserForm userForm,
 			BindingResult result,
+			RedirectAttributes redirAttrs,
 			Model model) {
 		
 		if(result.hasErrors()) {
@@ -45,6 +51,25 @@ public class UsersController {
 		}
 		userService.save(userForm);
 		
-		return "redirect:/users/new";
+		displayMessageRedirectHelper(
+				MessageAlertLevel.SUCCESS,
+				"ユーザーを新規作成しました",
+				redirAttrs
+				);
+		
+		
+		return "redirect:/login";
 	}
+	
+	private void displayMessageRedirectHelper(
+			MessageAlertLevel level,
+			String message,
+			RedirectAttributes redirAttrs) {
+		
+		redirAttrs.addFlashAttribute("hasMessage", true);
+		redirAttrs.addFlashAttribute("class", level.getCode());
+		redirAttrs.addFlashAttribute("message", message);
+	
+	}
+	
 }

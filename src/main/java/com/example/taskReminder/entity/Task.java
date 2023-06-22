@@ -48,6 +48,8 @@ public class Task extends AbstractEntity implements Serializable {
     
     private String deleted;
     
+    private Integer numberOfExecution;
+    
     
     public void setLoad(Load load) {
     	this.load = load.getCode();
