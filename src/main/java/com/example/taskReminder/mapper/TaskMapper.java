@@ -30,6 +30,7 @@ public interface TaskMapper {
         task.setStatus(Status.NON_EXECTED);
         task.setDeleted(Delete.VALID);
         task.setUserId(user.getUserId());
+        task.setImgUrl(taskForm.getImgUrl());
         return task;
     }
     
@@ -46,6 +47,7 @@ public interface TaskMapper {
     		form.setNumberOfExecution(entity.getNumberOfExecution());
     		form.setStatus(entity.getStatus().getCode());
     		form.setUserId(entity.getUserId());
+    		form.setImgUrl(entity.getImgUrl());
     		list.add(form);
     	}
     	return list;

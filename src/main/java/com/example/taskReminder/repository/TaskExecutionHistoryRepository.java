@@ -1,5 +1,7 @@
 package com.example.taskReminder.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,10 +12,6 @@ import com.example.taskReminder.entity.TasksExecutionHistory;
 @Repository
 public interface TaskExecutionHistoryRepository extends JpaRepository <TasksExecutionHistory, Long> {
 
-	/*
-	@Query(value = "select count(*) from taskExecutionHistory "
-			+ "where task_id = ?1;",
-			nativeQuery = true)
-	*/
 	Integer countByTaskId(Long taskId);
+	List<TasksExecutionHistory> findCreatedAtByTaskIdOrderByCreatedAtDesc(Long taskId); 
 }

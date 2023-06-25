@@ -27,12 +27,13 @@
 							<input type="hidden" th:field="*{load}" />
 							<input type="hidden" th:field="*{content}" />
 							<input type="hidden" th:field="*{taskId}" />
+							<input type="hidden" th:field="*{imgUrl}" />
 						</div>
 					</div>
 
 					<div class="d-grid gap-3">
 						<input type="submit" class="btn btn-primary btn-lg" th:value="#{A0002_add_task_button}" />
-						<input type="submit" class="btn btn-secondary btn-lg" name="redo" th:value="#{SYSCOMMON.back_button}" />
+						<input type="submit" class="btn btn-secondary btn-lg" name="redo" th:value="#{SYSCOMMON_back_button}" />
 					</div>
 				</div>
 			</form>

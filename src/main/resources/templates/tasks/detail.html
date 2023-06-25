@@ -5,14 +5,96 @@
 <body>
 	<div layout:fragment="contents">
 		<div class="py-5 text-center">
-			<h2 th:text="#{A0006_title}">タスクの実行状況を確認しましょう</h2>
-			<p class="lead" th:text="#{A0006_subtitle}"></p>
+			<h2 th:text="${title}"></h2>
+			<p class="lead" th:text="${subtitle}"></p>
 		</div>
-		
+
 		<div class="container">
-			<h1>Detail</h1>
-			<a class="btn w-100 btn-outline-light" th:href="@{/}">謌ｻ繧�</a>
+			<div class="d-grid gap-3 ms-3">
+				<a class="btn btn-secondary btn-lg w-25 " th:href="@{/}" th:value="#{SYSCOMMON_back_button}">戻る</a>
+			</div>
+			<canvas id="myChart"></canvas>
 		</div>
+
+
+
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script type="text/javascript" th:inline="javascript">
+			/*<![CDATA[*/
+			const ctx = document.getElementById('myChart').getContext('2d');
+
+			let values = /*[[ ${chartInputData} ]]*/"chartInputData";
+
+			new Chart(ctx, {
+				type : 'line',
+				data : {
+					datasets : [ {
+						label : '積み上げ実行回数',
+						data : values,
+						backgroundColor : 'rgb(255, 99, 132)',
+						borderColor : 'rgb(255, 99, 132)',
+						fill : true,
+					} ]
+				},
+				options : {
+					plugins : {
+						title : {
+							display : true,
+							text : 'タスク実行履歴',
+							font : {
+								size : 16
+							}
+						}
+					},
+					
+					
+					scales : {
+
+						xAxes : [ {
+							type : 'time',
+							time : {
+								unit : 'day',
+								displayFormats : {
+									day : 'YYYY/MM/DD' // ここに日付フォーマットを指定
+								}
+							}
+						} ],
+
+						x : {
+							title : {
+								display : true,
+								text : "実行日付",
+								font : {
+									size : 16
+								}
+							}
+						},
+
+						y : {
+							title : {
+								display : true,
+								text : "回数",
+								font : {
+									size : 16
+								}
+							},
+							min : 0,
+							ticks: {
+				            	stepSize: 10,
+				            },
+
+							beginAtZero : true,
+							stacked : true
+						}
+					}
+				}
+
+			});
+			/*]]>*/
+		</script>
+
 	</div>
+
+
 </body>
 </html>

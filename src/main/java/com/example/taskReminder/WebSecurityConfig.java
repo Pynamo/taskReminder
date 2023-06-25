@@ -21,7 +21,7 @@ public class WebSecurityConfig {
 	@Autowired
     private FormAuthenticationProvider authenticationProvider;
 
-    private static final String[] URLS = { "/css/**", "/images/**", "/scripts/**", "/h2-console/**", "/favicon.ico" };
+    private static final String[] URLS = { "/css/**", "/js/**", "/images/**", "/scripts/**", "/h2-console/**", "/favicon.ico" };
 
     /**
     * 認証から除外する
@@ -66,7 +66,7 @@ public class WebSecurityConfig {
 		    // CSS等の静的ファイルはログインなしでもアクセス可能
             //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
             // ここで指定したURLにはログインなしでもアクセス可能
-      		.antMatchers("/login", "/logout-complete", "/users/new", "/users/create", "/user", "/h2-console", "/css/**").permitAll()				
+      		.antMatchers("/login", "/logout-complete", "/users/new", "/users/create", "/user", "/h2-console", "/css/**", "/js/**").permitAll()				
             .anyRequest().authenticated()
             )
 		    .authenticationProvider(authenticationProvider);

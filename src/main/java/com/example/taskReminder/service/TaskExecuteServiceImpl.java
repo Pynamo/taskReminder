@@ -1,6 +1,8 @@
 package com.example.taskReminder.service;
 
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,18 @@ public class TaskExecuteServiceImpl implements TaskExecuteService {
 		tasksExecutionHistory.setTaskId(taskId);
 		taskExecutionHistoryRepository.save(tasksExecutionHistory);
 		
+	}
+
+	@Override
+	public List<TasksExecutionHistory> getTaskExecuteHistory(long taskId) throws BusinessException {
+		
+		List<TasksExecutionHistory> list = taskExecutionHistoryRepository.findCreatedAtByTaskIdOrderByCreatedAtDesc(taskId);
+		
+		if(list.size() == 0) {
+			throw new BusinessException("");
+		}
+		
+		return list;
 	}
 	
 	
