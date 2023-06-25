@@ -19,4 +19,6 @@ public interface TaskService {
 
 	Task getTask(Long taskId) throws ResourceNotFoundException;
 
+	String getSibaImageUrl();
+
 }

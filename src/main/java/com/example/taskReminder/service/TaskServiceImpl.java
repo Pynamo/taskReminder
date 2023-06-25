@@ -7,7 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -33,9 +39,18 @@ public class TaskServiceImpl implements TaskService {
     TaskRepository taskRepository;
 	@Autowired
     TaskExecutionHistoryRepository taskExecutionHistoryRepository;
+	@Autowired
+    private RestTemplate restTemplate;
 	
-	@Value("${max.registration:5}") 
+	@Value("${max.registration:3}") 
 	private int max_registration;
+	
+	@Value("${sibe.url:}")
+	private String sibe_image_request_url;
+	@Value("${recovery.url:}")
+	private String recovery_sibe_image_url;
+	@Value("${retry.max.count:3}")
+	private int retryMaxCount;
 
 	/**
 	 * タスク登録処理
@@ -123,5 +138,42 @@ public class TaskServiceImpl implements TaskService {
 			throw new ResourceNotFoundException("Task not found!");
 		}
 		return task;
+	}
+
+	/**
+	 * sibe.onlineのAPI経由で柴犬画像を取得する
+	 */
+	@Override
+	public String getSibaImageUrl() {
+		
+		int retryCount = 0;
+		
+		RequestEntity<Void> requestEntity = RequestEntity.get(sibe_image_request_url).build();
+		List<String> imgUrl = new ArrayList<>();
+
+		while (true) {
+
+			// リクエストの送信
+			ResponseEntity<List<String>> response = restTemplate.exchange(requestEntity, new ParameterizedTypeReference<List<String>>(){});
+
+		    if (response.getStatusCode() == HttpStatus.OK) {
+		    	imgUrl = response.getBody();
+		        break;  
+		    } 
+		    
+		    if(retryCount == retryMaxCount) {
+		    	log.error("柴犬画像を取得できませんでした。");
+		    	break;
+		    }
+		    
+		    retryCount++;
+		}
+		
+		if(imgUrl.size() == 0) {
+			imgUrl.add(recovery_sibe_image_url);
+		}
+
+
+		return imgUrl.get(0);
 	}
 }

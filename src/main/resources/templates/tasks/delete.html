@@ -105,10 +105,7 @@
 
 							<div class="col">
 								<div class="card shadow-sm">
-									<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice"
-										focusable="false">
-										<rect width="100%" height="100%" fill="#55595c" />
-									</svg>
+									<img style="object-fit: cover; width:auto; height:400px; " class="bd-placeholder-img card-img-top" th:src="${list.taskFormList[__${itemStat.index}__].imgUrl}"></img>
 
 									<div class="card-body">
 										<h5 class="card-title" th:text="${list.taskFormList[__${itemStat.index}__].name}"></h5>

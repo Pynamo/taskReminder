@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // FIXME ログアウト機能追加
 // TODO　言語変更機能追加
 // TODO ドキュメントまとめ
+// TODO 更新画面の文章を可変にする
 // FIXME CSSが見つからない問題の解決
 
 @SpringBootApplication

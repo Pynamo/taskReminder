@@ -46,6 +46,8 @@ public class Task extends AbstractEntity implements Serializable {
     //@Enumerated(EnumType.STRING)
     private String status;
     
+    private String imgUrl;
+    
     private String deleted;
     
     private Integer numberOfExecution;

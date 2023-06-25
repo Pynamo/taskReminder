@@ -84,7 +84,7 @@ public class TaskServiceImplTest {
 		void setUp() throws Exception {
 			// タスク登録上限を3に設定
 			ReflectionTestUtils.setField(taskServiceImpl, "max_registration", 3);
-		}
+		} 
 		
 		@ParameterizedTest
 		@ValueSource(ints = {3, 4})
