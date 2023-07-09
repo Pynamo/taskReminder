@@ -62,11 +62,15 @@
 
 										<div class="d-flex jusify-content-between align-items-end">
 										
-											<form method="get" class="form-horizontal py-4 flex-grow-1" th:action="@{/task}">
+											<form method="get" class="form-horizontal py-4 flex-grow-1" th:action="@{/update}">
 												<input type="hidden" name="task_id" th:value="${item.taskId}" />
-												<input type="submit" class="btn btn-outline-primary" name="update" th:value="#{A0001_task_edit_button}" />
-												<input type="submit" class="btn btn-outline-success" name="detail" th:value="#{A0001_task_detail_button}" />
+												<input type="submit" class="btn btn-outline-primary" th:value="#{A0001_task_edit_button}" />
 											</form>
+											<form method="get" class="form-horizontal py-4 flex-grow-1" th:action="@{/detail}">
+												<input type="hidden" name="task_id" th:value="${item.taskId}" />
+												<input type="submit" class="btn btn-outline-success" th:value="#{A0001_task_detail_button}" />
+											</form>
+											
 											<small class="text-muted">実行回数: [[${item.numberOfExecution}]]回</small>
 										</div>
 									</div>

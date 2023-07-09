@@ -75,32 +75,14 @@ public class TaskServiceImpl implements TaskService {
 	 * @throws SystemException 
 	 */
 	@Override
-	public List<Task> getTaskList(Long userId) throws ResourceNotFoundException, SystemException {
+	public List<Task> getTaskList(Long userId) throws ResourceNotFoundException {
 		
 		List<Task> tasks = taskRepository.myFindByUserId(userId);
 		if(Objects.isNull(tasks)) {
 			throw new ResourceNotFoundException("Task not found!");
 		}
 		
-		List<Task> list = new ArrayList<Task>();
-		
-		// タスク実行履歴テーブルから過去の実行回数を取得し、nullでなければTaskエンティティに追加する
-		for(Task data : tasks) {
-			
-			int numberOfExecution = 0;
-			
-			try {
-				numberOfExecution = taskExecutionHistoryRepository.countByTaskId(data.getTaskId());
-			} catch(NullPointerException e) {
-				throw new SystemException("");
-			}
-			
-			data.setNumberOfExecution(numberOfExecution);
-			
-			list.add(data);
-		}
-		
-		return list;
+		return tasks;
 	}
 
 	/**
@@ -175,5 +157,35 @@ public class TaskServiceImpl implements TaskService {
 
 
 		return imgUrl.get(0);
+	}
+
+	@Override
+	public List<TaskForm> getTaskNumberOfExecution(List<TaskForm> tasks) throws SystemException {
+		
+		List<TaskForm> list = new ArrayList<TaskForm>();
+		
+		// タスク実行履歴テーブルから過去の実行回数を取得し、nullでなければTaskエンティティに追加する
+		for(TaskForm data : tasks) {
+			
+			int numberOfExecution = 0;
+			
+			try {
+				numberOfExecution = taskExecutionHistoryRepository.countByTaskId(data.getTaskId());
+			} catch(NullPointerException e) {
+				throw new SystemException("");
+			}
+			
+			data.setNumberOfExecution(numberOfExecution);
+			
+			list.add(data);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public void update(Task task) {
+		
+		taskRepository.save(task);
 	}
 }

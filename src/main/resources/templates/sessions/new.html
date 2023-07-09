@@ -6,7 +6,9 @@
 	<div layout:fragment="contents">
 		<div class="py-5 text-center">
 			<h2>ログイン</h2>
-			<p class="lead">習慣にしたいけど長続きしない日々の読書、ランニング、ダイエット。<br>そんな時は記録を取って、日々の積み上げを可視化しましょう。</p>
+			<p class="lead">
+				習慣にしたいけど長続きしない日々の読書、ランニング、ダイエット。<br>そんな時は記録を取って、日々の積み上げを可視化しましょう。
+			</p>
 		</div>
 
 		<div class="container-signin d-grid gap-3">
@@ -30,6 +32,11 @@
 			<form method="get" class="form-horizontal" th:action="@{/users/new}">
 				<input type="submit" class="w-100 btn btn-lg btn-secondary" th:value="#{A0008_new_user_create_button}" />
 			</form>
+
+			<a class="btn btn-lg btn-social btn-google text-center" th:href="@{/oauth2/authorization/google}"> 
+				<span class="fa fa-google"></span>
+				<span th:text="#{A0007_google_login_button}" /></span>
+			</a>
 		</div>
 
 	</div>

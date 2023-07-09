@@ -31,6 +31,7 @@ public interface TaskMapper {
         task.setDeleted(Delete.VALID);
         task.setUserId(user.getUserId());
         task.setImgUrl(taskForm.getImgUrl());
+        
         return task;
     }
     
@@ -44,7 +45,7 @@ public interface TaskMapper {
     		form.setName(entity.getName());
     		form.setContent(entity.getContent());
     		form.setLoad(entity.getLoad().getName());
-    		form.setNumberOfExecution(entity.getNumberOfExecution());
+    		//form.setNumberOfExecution(entity.getNumberOfExecution());
     		form.setStatus(entity.getStatus().getCode());
     		form.setUserId(entity.getUserId());
     		form.setImgUrl(entity.getImgUrl());
