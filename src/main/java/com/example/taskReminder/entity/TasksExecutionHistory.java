@@ -8,11 +8,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name="tasksexecutionhistory")
 public class TasksExecutionHistory extends AbstractEntity implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -24,7 +26,5 @@ public class TasksExecutionHistory extends AbstractEntity implements Serializabl
     
     @Column(nullable = false)
     private Long taskId;
-    
-    private String deleted;
 
 }

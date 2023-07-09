@@ -10,9 +10,8 @@ import com.example.taskReminder.entity.Task;
 @Repository
 public interface TaskRepository extends JpaRepository <Task, Long> {
 
-	// 検索条件にnullを含めるのはOK？
 	@Query(value = "select * from tasks "
-			+ "where user_id = ?1 and deleted = '0';",
+			+ "where user_id = ?1 and deleted = '0' order by task_id;",
 			nativeQuery = true)
 	List<Task> myFindByUserId(Long userId);
 

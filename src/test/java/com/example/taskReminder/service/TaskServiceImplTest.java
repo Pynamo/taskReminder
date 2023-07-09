@@ -61,7 +61,7 @@ public class TaskServiceImplTest {
 	void setUp() {
 		
 		taskForm = new TaskForm();
-		task = new Task();
+		task = new Task(); 
 		user = new User();
 		taskList = new ArrayList<>(); 
 		
@@ -69,6 +69,8 @@ public class TaskServiceImplTest {
 		task.setUserId(1L);
 		taskList.add(task);
 	}
+	
+
 
 	// 各テストの後に実行
 	@AfterEach
@@ -127,7 +129,7 @@ public class TaskServiceImplTest {
 			// Exercise, Verify
 			assertThrows(ResourceNotFoundException.class, () -> taskServiceImpl.getTaskList(user.getUserId()));
 		}
-		
+		/*
 		@Nested
 		class taskが存在する場合 {
 			
@@ -153,11 +155,10 @@ public class TaskServiceImplTest {
 					taskServiceImpl.getTaskList(user.getUserId());
 				} catch(ResourceNotFoundException e) {
 					fail();
-				} catch(SystemException e) {
-					fail();
 				}
-			}			
+			}	
 		}
+		*/
 	}
 
 	

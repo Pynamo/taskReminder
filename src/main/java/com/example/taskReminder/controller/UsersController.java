@@ -16,8 +16,6 @@ import com.example.taskReminder.form.UserForm;
 import com.example.taskReminder.service.UserService;
 import com.example.taskReminder.validation.PasswordEqualsValidator;
 
-import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
-import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
 
 @Controller
 public class UsersController {

@@ -12,8 +12,12 @@ import com.example.taskReminder.form.TaskForm;
 public interface TaskService {
 
 	void save(TaskForm taskForm, UserInf user) throws BusinessException;
+	
+	void update(Task task);
 
-	List<Task> getTaskList(Long userId) throws ResourceNotFoundException, SystemException;
+	List<Task> getTaskList(Long userId) throws ResourceNotFoundException;
+	
+	List<TaskForm> getTaskNumberOfExecution(List<TaskForm> tasks) throws SystemException;
 
 	void deleteTask(Long taskId) throws ResourceNotFoundException, BusinessException;
 

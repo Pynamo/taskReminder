@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<head>
+</head>
+<body>
+	<div layout:fragment="contents">
+		<div class="py-5 text-center">
+			<h2 th:text="#{A0003_title}">タスク名や意気込みを変更して気分を変えましょう</h2>
+			<p class="lead" th:text="#{A0003_subtitle}">タスク名や意気込みを変更しても、タスクに関する今までの記録は残ったままです。心機一転してタスクに取り組みましょう。なお柴犬は差し替えできません。</p>
+		</div>
+
+		<div class="container-signin d-grid gap-3">
+
+			<form th:object="${taskForm}" method="post" class="form-horizontal" th:action="@{/update}">
+				<div class="d-grid gap-5">
+					<div class="form-floating">
+						<input type="text" class="form-control" th:field="*{name}" id="floatingInput">
+						<label for="floatingInput" th:text="#{A0002_task_name_input_label}">タスク名</label> 
+						<span class="text-danger" th:errors=*{name}></span>
+					</div>
+					<div class="form-floating">
+						<select class="form-select form-control" th:field="*{load}">
+							<option th:each="item : ${loadMst}" th:value="${item.key}" th:text="${item.value}"></option>
+						</select> <label for="floatingInput" th:text="#{A0002_task_load_input_label}">想定される負荷</label>
+					</div>
+					<div class="form-floating">
+						<textarea class="form-control" th:field="*{content}" id="floatingInput" style="height: 200px"></textarea>
+						<label for="floatingInput" th:text="#{A0002_task_content_input_label}">意気込み</label> 
+						<span class="text-danger" th:errors=*{content}></span>
+					</div>
+					<input type="hidden" th:field="*{taskId}" />
+					<input type="submit" class="btn btn-primary btn-lg" name="confirm" th:value="#{A0003_update_task_button}" />
+				</div>
+			</form>
+
+			<form method="get" class="form-horizontal" th:action="@{/}">
+				<input type="submit" class="w-100 btn btn-lg btn-secondary" th:value="戻る" />
+			</form>
+
+		</div>
+	</div>
+</body>
+</html>

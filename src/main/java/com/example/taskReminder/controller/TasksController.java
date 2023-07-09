@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 import org.springframework.core.ParameterizedTypeReference;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -44,11 +45,7 @@ import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
 import com.example.taskReminder.exception.SystemException;
 
-import jp.fintan.keel.spring.web.token.transaction.TransactionTokenCheck;
-import jp.fintan.keel.spring.web.token.transaction.TransactionTokenType;
-
 @Controller
-@TransactionTokenCheck("tasks")
 public class TasksController {
 
 	protected static Logger log = LoggerFactory.getLogger(TasksController.class);
@@ -84,12 +81,18 @@ public class TasksController {
 
 		} catch (ResourceNotFoundException e) {
 			// TODO 画面にメッセージを出力する
-		} catch (SystemException e) {
-			// TODO システム例外IDを画面に表示する
 		}
 
 		List<TaskForm> list = new ArrayList<>();
 		list = TaskMapper.INSTANCE.tasksToTaskForm(tasks);
+		
+		try {
+			list = taskService.getTaskNumberOfExecution(list);
+		} catch(SystemException e) {
+			// TODO システム例外IDを画面に表示する
+		}
+		
+		
 		model.addAttribute("list", list);
 
 		return "tasks/index";
@@ -174,7 +177,6 @@ public class TasksController {
 	/**
 	 * 削除画面呼び出し タスクが一つも登録されていない時はResouceNotFoundException発生
 	 */
-	// @TransactionTokenCheck(type = TransactionTokenType.BEGIN)
 	@GetMapping(value = "/delete", params = "form")
 	public String deleteList(Principal principal, Model model) {
 
@@ -187,8 +189,6 @@ public class TasksController {
 			tasks = taskService.getTaskList(user.getUserId());
 		} catch (ResourceNotFoundException e) {
 			// TODO 削除対象が見つからない時はエラーメッセージ表示
-		} catch (SystemException e) {
-			// TODO システム例外IDを表示
 		}
 
 		TaskFormList taskFormList = new TaskFormList();
@@ -221,7 +221,10 @@ public class TasksController {
 	 */
 
 	@PostMapping(value = "/delete")
-	public String deleteSelected(TaskFormList taskFormList, Principal principal, RedirectAttributes redirAttrs) {
+	public String deleteSelected(
+			TaskFormList taskFormList, 
+			Principal principal, 
+			RedirectAttributes redirAttrs) {
 
 		if (Objects.isNull(taskFormList.getTaskFormList())) {
 			displayMessageRedirectHelper(MessageAlertLevel.WARNING, "タスクが存在しません", redirAttrs);
@@ -269,8 +272,10 @@ public class TasksController {
 	 * タスク内容の更新（タスクを取得し、新規作成時と同じhtmlのフォームに値を詰める）
 	 * 対象のタスクが存在しない時はResourceNotFoundException発生
 	 */
-	@GetMapping(value = "/task", params = "update")
-	public String updateForm(@RequestParam("task_id") long taskId, Model model) {
+	@GetMapping(value = "/update")
+	public String updateForm(
+			@RequestParam("task_id") long taskId, 
+			Model model) {
 
 		Task task = new Task();
 
@@ -286,13 +291,54 @@ public class TasksController {
 		model.addAttribute("loadMst", Load.getLoadData());
 		model.addAttribute("taskForm", taskForm);
 
-		return "tasks/new";
+		return "tasks/update";
+	}
+	
+	@PostMapping(value = "/update")
+	public String update(
+			@Validated TaskForm taskForm, 
+			BindingResult result,
+			Principal principal,
+			RedirectAttributes redirAttrs,
+			Model model) {
+		
+		if (result.hasErrors()) {
+			model.addAttribute("loadMst", Load.getLoadData());
+			model.addAttribute("taskForm", taskForm);
+			return "tasks/update";
+		}
+		
+		Task task = new Task();
+
+		try {
+			task = taskService.getTask(taskForm.getTaskId());
+		} catch (ResourceNotFoundException e) {
+			log.error("Task is not found!");
+			displayMessageRedirectHelper(
+					MessageAlertLevel.ERROR, 
+					"対象が見つかりません", 
+					redirAttrs);
+			
+			return "redirect:/";
+		}
+		
+		task.setName(taskForm.getName());
+		task.setContent(taskForm.getContent());
+		task.setLoad(Load.getValue(taskForm.getLoad()));
+		task.setUpdatedAt(new Date());
+		
+		
+		taskService.update(task);
+		displayMessageRedirectHelper(MessageAlertLevel.SUCCESS, "タスクを更新しました。新規一転頑張りましょう！", redirAttrs);
+		
+		
+		return "redirect:/";
 	}
 
 	/**
 	 * タスク詳細画面表示（実行履歴をグラフ表示） 対象のタスクが存在しない時はResourceNotFoundException発生
 	 */
-	@GetMapping(value = "/task", params = "detail")
+	@GetMapping(value = "/detail")
 	public String detail(@RequestParam("task_id") long taskId, Model model) {
 
 		Task task = new Task();

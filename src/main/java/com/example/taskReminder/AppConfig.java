@@ -5,13 +5,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @ComponentScan
-@PropertySource(value = {"classpath:max_number_of_registration.properties"})
-@PropertySource(value = {"classpath:sibe_online_api_url.properties"})
+@PropertySources({
+	@PropertySource(value = {"classpath:max_number_of_registration.properties"}),
+	@PropertySource(value = {"classpath:sibe_online_api_url.properties"})
+})
 public class AppConfig {
 
     @Bean
@@ -23,5 +26,5 @@ public class AppConfig {
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
     }
-
+    
 }
