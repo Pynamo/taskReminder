@@ -275,6 +275,7 @@ public class TasksController {
 	@GetMapping(value = "/update")
 	public String updateForm(
 			@RequestParam("task_id") long taskId, 
+			RedirectAttributes redirAttrs,
 			Model model) {
 
 		Task task = new Task();
@@ -283,7 +284,8 @@ public class TasksController {
 			task = taskService.getTask(taskId);
 		} catch (ResourceNotFoundException e) {
 			log.error("Task is not found!");
-			displayMessageForwardHelper(MessageAlertLevel.ERROR, "対象が見つかりません", model);
+			displayMessageRedirectHelper(MessageAlertLevel.ERROR, "対象が見つかりません", redirAttrs);
+			return "redirect:/";
 		}
 
 		TaskForm taskForm = TaskMapper.INSTANCE.taskToForm(task);
@@ -291,7 +293,7 @@ public class TasksController {
 		model.addAttribute("loadMst", Load.getLoadData());
 		model.addAttribute("taskForm", taskForm);
 
-		return "tasks/update";
+		return "tasks/update"; 
 	}
 	
 	@PostMapping(value = "/update")
@@ -400,8 +402,8 @@ public class TasksController {
 
 	private void displayMessageRedirectHelper(MessageAlertLevel level, String message, RedirectAttributes redirAttrs) {
 
-		redirAttrs.addFlashAttribute("hasMessage", true);
-		redirAttrs.addFlashAttribute("class", level.getCode());
+		redirAttrs.addFlashAttribute("hasMessage", true); 
+		redirAttrs.addFlashAttribute("class", level.getCode()); 
 		redirAttrs.addFlashAttribute("message", message);
 
 	}

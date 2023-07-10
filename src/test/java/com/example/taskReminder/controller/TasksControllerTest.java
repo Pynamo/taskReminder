@@ -1,10 +1,12 @@
 package com.example.taskReminder.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,11 +14,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,6 +43,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -47,9 +54,10 @@ import com.example.taskReminder.entity.User;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.entity.TestUser;
 import com.example.taskReminder.exception.BusinessException;
-import com.example.taskReminder.exception.ResourceNotFoundException;
 import com.example.taskReminder.exception.SystemException;
+import com.example.taskReminder.exception.ResourceNotFoundException;
 import com.example.taskReminder.form.TaskForm;
+import com.example.taskReminder.form.TaskFormList;
 import com.example.taskReminder.mapper.TaskMapper;
 import com.example.taskReminder.service.TaskService;
 
@@ -206,34 +214,215 @@ public class TasksControllerTest {
 	        .andExpect(redirectedUrl("/")); 
 	}
 */
-
-}
-
-
-/*
-	@PostMapping(value = "/create")
-	public String create(@Validated TaskForm taskForm, BindingResult bindingResult, Principal principal,
-			RedirectAttributes redirAttrs, Model model) {
-
-		Authentication authentication = (Authentication) principal;
-		UserInf user = (UserInf) authentication.getPrincipal();
+	@Nested
+	class deleteSelectedメソッドの検証 {
 		
-		try {
-			taskService.save(taskForm, user);
-		} catch (BusinessException e) {
-
-			log.error("Task is full!");
-			displayMessageRedirectHelper(
-					MessageAlertLevel.ERROR, 
-					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう", // TODO
-					redirAttrs);
-
-			return "redirect:/";
+		@Test
+		void taskFormListがnullの時ならタスクが存在しないと警告を出す() throws Exception {
+			
+			TaskFormList taskFormList = new TaskFormList();
+			taskFormList.setTaskFormList(null);
+			
+		    mockMvc.perform(post("/delete")
+		    		.flashAttr("taskFormList", taskFormList))
+		        .andExpect(status().is3xxRedirection())
+		        .andExpect(redirectedUrl("/delete?form"))
+		        .andExpect(flash().attribute("class", MessageAlertLevel.WARNING.getCode()));   
+			
 		}
+		
+		@Test
+		void 削除対象のタスクが選択されていないなら警告を出す() throws Exception {
 
-		displayMessageRedirectHelper(MessageAlertLevel.SUCCESS, "新しいタスクを登録しました。頑張って習慣化しましょう！", redirAttrs);
+			TaskFormList taskFormList = new TaskFormList();
+			TaskForm taskForm = new TaskForm();
+			taskForm.setSelected(false);
+			List<TaskForm> list = new ArrayList<>();
+			list.add(taskForm);
+			taskFormList.setTaskFormList(list);
+			
+		    mockMvc.perform(post("/delete")
+		    		.flashAttr("taskFormList", taskFormList))
+		        .andExpect(status().is3xxRedirection())
+		        .andExpect(redirectedUrl("/delete?form"))
+		        .andExpect(flash().attribute("class", MessageAlertLevel.WARNING.getCode()));    
+			
+		}
+		
+		@Test
+		void 選択されたタスクの削除が実行されることを確認する() throws Exception {
 
-		return "redirect:/";
+			TaskFormList taskFormList = new TaskFormList();
+			TaskForm taskForm = new TaskForm();
+			taskForm.setSelected(true);
+			taskForm.setTaskId(1L);
+			List<TaskForm> list = new ArrayList<>();
+			list.add(taskForm);
+			taskFormList.setTaskFormList(list);
+			
+			
+			Mockito.doNothing().when(taskService).deleteTask(taskForm.getTaskId());
+			
+		    mockMvc.perform(post("/delete")
+		    		.flashAttr("taskFormList", taskFormList))
+		        .andExpect(status().is3xxRedirection())
+		        .andExpect(redirectedUrl("/delete?form"))
+		        .andExpect(flash().attribute("class", MessageAlertLevel.SUCCESS.getCode()));    
+		    
+		    
+
+		}
+		
+		@Test
+		void 選択されたタスクがDBに存在しなければResourceNotFoundExceptionを送出する() throws Exception {
+
+			TaskFormList taskFormList = new TaskFormList();
+			TaskForm taskForm = new TaskForm();
+			taskForm.setSelected(true);
+			taskForm.setTaskId(1L);
+			List<TaskForm> list = new ArrayList<>();
+			list.add(taskForm);
+			taskFormList.setTaskFormList(list);
+			
+			Mockito.doThrow(ResourceNotFoundException.class).when(taskService).deleteTask(taskForm.getTaskId());
+			
+		    mockMvc.perform(post("/delete")
+		    		.flashAttr("taskFormList", taskFormList))
+		        .andExpect(status().is3xxRedirection())
+		        .andExpect(redirectedUrl("/delete?form"))
+		        .andExpect(flash().attribute("class", MessageAlertLevel.ERROR.getCode()));    
+
+		}
+		
+		@Test
+		void 選択されたタスクが既に削除されていればBuisinessExceptionを送出する() throws Exception {
+
+			TaskFormList taskFormList = new TaskFormList();
+			TaskForm taskForm = new TaskForm();
+			taskForm.setSelected(true);
+			taskForm.setTaskId(1L);
+			List<TaskForm> list = new ArrayList<>();
+			list.add(taskForm);
+			taskFormList.setTaskFormList(list);
+			
+			
+			Mockito.doThrow(BusinessException.class).when(taskService).deleteTask(taskForm.getTaskId());
+			
+		    mockMvc.perform(post("/delete")
+		    		.flashAttr("taskFormList", taskFormList))
+		        .andExpect(status().is3xxRedirection())
+		        .andExpect(redirectedUrl("/delete?form"))
+		        .andExpect(flash().attribute("class", MessageAlertLevel.ERROR.getCode()));    
+
+		}
+		
+	}
+	
+	@Nested
+	class updateFormメソッドの検証 {
+		
+		@Test
+		void タスクの取得成功() throws Exception {
+			
+			long taskId = 1L;
+			
+			Task task = new Task();
+			task.setTaskId(taskId);
+			task.setName("name");
+			task.setContent("content");
+			task.setLoad(Load.HIGH);
+			
+			when(taskService.getTask(taskId)).thenReturn(task);
+			
+		    mockMvc.perform(get("/update")
+		    		.param("task_id", String.valueOf(taskId)))
+	            .andExpect(status().isOk())
+	            .andExpect(view().name("tasks/update"))
+	            .andExpect(model().attribute("loadMst", Load.getLoadData()))
+	            .andExpect(model().attribute("taskForm", TaskMapper.INSTANCE.taskToForm(task)));
+			
+		    Mockito.verify(taskService, Mockito.times(1)).getTask(taskId);
+
+		}
+		
+		@Test
+		void タスクの取得失敗() throws Exception {
+			
+			long taskId = 1L;
+			
+			Mockito.doThrow(ResourceNotFoundException.class).when(taskService).getTask(taskId);
+			
+		    mockMvc.perform(get("/update")
+		    		.param("task_id", String.valueOf(taskId)))
+	            .andExpect(status().is3xxRedirection())
+	            .andExpect(redirectedUrl("/"))
+	            .andExpect(flash().attribute("class", MessageAlertLevel.ERROR.getCode()));
+			
+		    Mockito.verify(taskService, Mockito.times(1)).getTask(taskId);	
+		}
+		
+	}
+	
+	@Nested
+	class updateメソッドの検証 {
+		
+		@Test
+		void バリデーションエラー発生() throws Exception {
+			
+			TaskForm taskForm = new TaskForm();
+			
+			mockMvc.perform(post("/update")
+		    		.flashAttr("taskForm", taskForm))
+	            .andExpect(status().isOk())
+	            .andExpect(view().name("tasks/update"))
+	            .andExpect(model().attribute("loadMst", Load.getLoadData()))
+	            .andExpect(model().attribute("taskForm", taskForm));
+
+		}
+		
+		@Test
+		void update成功() throws Exception {
+			
+			TaskForm taskForm = new TaskForm();
+			
+			taskForm.setTaskId(1L);
+			taskForm.setName("name");
+			taskForm.setLoad(Load.HIGH.getCode());
+			taskForm.setContent("content");
+			
+			Task task = new Task();
+			
+			when(taskService.getTask(taskForm.getTaskId())).thenReturn(task);
+			Mockito.doNothing().when(taskService).update(task);
+			
+			mockMvc.perform(post("/update")
+		    		.flashAttr("taskForm", taskForm))
+	            .andExpect(status().is3xxRedirection())
+	            .andExpect(redirectedUrl("/"))
+	            .andExpect(flash().attribute("class", MessageAlertLevel.SUCCESS.getCode()));
+			
+		}
+		
+		@Test
+		void ResourceNotFound送出によるupdate失敗() throws Exception {
+			
+			TaskForm taskForm = new TaskForm();
+			
+			taskForm.setTaskId(1L);
+			taskForm.setName("name");
+			taskForm.setLoad(Load.HIGH.getCode());
+			taskForm.setContent("content");
+			
+			Mockito.doThrow(ResourceNotFoundException.class).when(taskService).getTask(taskForm.getTaskId());
+			
+			mockMvc.perform(post("/update")
+		    		.flashAttr("taskForm", taskForm))
+	            .andExpect(status().is3xxRedirection())
+	            .andExpect(redirectedUrl("/"))
+	            .andExpect(flash().attribute("class", MessageAlertLevel.ERROR.getCode()));
+			
+		}
+		
 	}
 
-*/
+}
