@@ -107,7 +107,7 @@ public class TaskServiceImpl implements TaskService {
 		taskRepository.save(task);	
 	}
 
-	
+	 
 	/**
 	 * タスク取得（1個)
 	 * 登録済のタスクが見つからなければResourceNotFoundExceptionを投げる
@@ -155,7 +155,7 @@ public class TaskServiceImpl implements TaskService {
 			imgUrl.add(recovery_sibe_image_url);
 		}
 
-
+ 
 		return imgUrl.get(0);
 	}
 
