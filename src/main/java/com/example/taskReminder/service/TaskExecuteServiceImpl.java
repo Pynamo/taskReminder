@@ -35,17 +35,13 @@ public class TaskExecuteServiceImpl implements TaskExecuteService {
 	 * 4. タスク実行履歴に保存
 	 */
 	@Override
-	public void execute(Long taskId) throws SystemException, BusinessException {
+	public void execute(Long taskId) throws BusinessException {
 		
 		Task task = taskRepository.myfindByTaskId(taskId);
 		
-		if(Objects.isNull(task.getStatus())) {
-			throw new SystemException("");
-		}
-		
 		if(task.getStatus().equals(Status.EXECUTED)) {
 			throw new BusinessException("");
-		}
+		} 
 		
 		task.setStatus(Status.EXECUTED);
 		taskRepository.save(task);

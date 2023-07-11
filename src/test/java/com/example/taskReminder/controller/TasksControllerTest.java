@@ -13,9 +13,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.junit.jupiter.api.AfterEach;
@@ -30,6 +32,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -50,15 +53,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.taskReminder.common.Load;
 import com.example.taskReminder.common.MessageAlertLevel;
 import com.example.taskReminder.entity.Task;
+import com.example.taskReminder.entity.TasksExecutionHistory;
 import com.example.taskReminder.entity.User;
 import com.example.taskReminder.entity.UserInf;
 import com.example.taskReminder.entity.TestUser;
 import com.example.taskReminder.exception.BusinessException;
 import com.example.taskReminder.exception.SystemException;
 import com.example.taskReminder.exception.ResourceNotFoundException;
+import com.example.taskReminder.form.ChartJsInputDataObject;
 import com.example.taskReminder.form.TaskForm;
 import com.example.taskReminder.form.TaskFormList;
 import com.example.taskReminder.mapper.TaskMapper;
+import com.example.taskReminder.service.TaskExecuteService;
 import com.example.taskReminder.service.TaskService;
 
 @SpringBootTest
@@ -68,6 +74,11 @@ public class TasksControllerTest {
 	
 	@Mock
 	private TaskService taskService;
+	@Mock
+	private TaskExecuteService taskExecuteService;
+	@Mock
+	private MessageSource messages;
+	
 	
 	private AutoCloseable closeable;
 	
@@ -424,5 +435,82 @@ public class TasksControllerTest {
 		}
 		
 	}
+	
+	@Nested
+	class detailメソッドの検証 {
+		
+		@Test
+		void ResourceNotFoundException送出によるタスク取得失敗() throws Exception {
+			
+			long taskId = 1L;
+			
+			Mockito.doThrow(ResourceNotFoundException.class).when(taskService).getTask(taskId);
+			
+			mockMvc.perform(get("/detail")
+					.param("task_id", String.valueOf(taskId)))
+	            .andExpect(status().is3xxRedirection())
+	            .andExpect(redirectedUrl("/"))
+	            .andExpect(flash().attribute("class", MessageAlertLevel.ERROR.getCode()));
+			
+		}
+		
+		@Test
+		void タスクが過去に1度も実行されていないことによるBuisinessException送出() throws Exception {
+			
+			long taskId = 1L;
+			Task task = new Task();
+			
+			task.setName("name");
+			task.setLoad(Load.HIGH);
+			
+			when(taskService.getTask(taskId)).thenReturn(task);
+			Mockito.doThrow(BusinessException.class).when(taskExecuteService).getTaskExecuteHistory(taskId);
+			
+			when(messages.getMessage("A0006_title", new String[] { task.getName() }, Locale.JAPAN)).thenReturn("title");
+			when(messages.getMessage("A0006_subtitle_load_high", null, Locale.JAPAN)).thenReturn("subtitle");
+			
+			
+			mockMvc.perform(get("/detail")
+					.param("task_id", String.valueOf(taskId)))
+	            .andExpect(status().isOk())
+	            .andExpect(view().name("tasks/detail"))
+	            .andExpect(model().attribute("class", MessageAlertLevel.WARNING.getCode()));
+		}
+		
+		@Test
+		void タスク詳細情報の取得成功() throws Exception {
+			
+			long taskId = 1L;
+			Task task = new Task();
+			
+			task.setName("name");
+			task.setLoad(Load.HIGH);
+			
+			List<TasksExecutionHistory> list = new ArrayList<>();
+			
+			TasksExecutionHistory item = new TasksExecutionHistory();
+			SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date date = df.parse("2023/06/06 12:00:00");
+			item.setCreatedAt(date);
+			
+			list.add(item);
+			
+			when(taskService.getTask(taskId)).thenReturn(task);
+			when(taskExecuteService.getTaskExecuteHistory(taskId)).thenReturn(list);
+			when(messages.getMessage("A0006_title", new String[] { task.getName() }, Locale.JAPAN)).thenReturn("title");
+			when(messages.getMessage("A0006_subtitle_load_high", null, Locale.JAPAN)).thenReturn("subtitle");
+			
+			mockMvc.perform(get("/detail")
+					.param("task_id", String.valueOf(taskId)))
+	            .andExpect(status().isOk())
+	            .andExpect(view().name("tasks/detail"));
+			
+			Mockito.verify(taskExecuteService, Mockito.times(1)).getTaskExecuteHistory(taskId);
+			
+		}
+		
+		
+	}
+
 
 }
