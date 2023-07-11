@@ -8,7 +8,7 @@ import com.example.taskReminder.exception.SystemException;
 
 public interface TaskExecuteService {
 
-	void execute(Long taskId) throws SystemException, BusinessException;
+	void execute(Long taskId) throws BusinessException;
 
 	List<TasksExecutionHistory> getTaskExecuteHistory(long taskId) throws BusinessException;
 }

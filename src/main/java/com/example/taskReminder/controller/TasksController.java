@@ -341,7 +341,10 @@ public class TasksController {
 	 * タスク詳細画面表示（実行履歴をグラフ表示） 対象のタスクが存在しない時はResourceNotFoundException発生
 	 */
 	@GetMapping(value = "/detail")
-	public String detail(@RequestParam("task_id") long taskId, Model model) {
+	public String detail(
+			@RequestParam("task_id") long taskId, 
+			RedirectAttributes redirAttrs,
+			Model model) {
 
 		Task task = new Task();
 
@@ -349,7 +352,8 @@ public class TasksController {
 			task = taskService.getTask(taskId);
 		} catch (ResourceNotFoundException e) {
 			log.error("Task is not found!");
-			displayMessageForwardHelper(MessageAlertLevel.ERROR, "対象が見つかりません", model);
+			displayMessageRedirectHelper(MessageAlertLevel.ERROR, "対象が見つかりません", redirAttrs);
+			return "redirect:/";
 		}
 
 		/**
