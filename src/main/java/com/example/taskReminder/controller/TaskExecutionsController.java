@@ -45,13 +45,6 @@ public class TaskExecutionsController {
 					redirAttrs
 					);
 			
-		} catch(SystemException e) {
-			displayMessageRedirectHelper(
-					MessageAlertLevel.ERROR, 
-					"システム例外", 
-					redirAttrs
-					);
-			
 		} catch(BusinessException e) {
 			log.error("Task is already executed!");
 			displayMessageRedirectHelper(
