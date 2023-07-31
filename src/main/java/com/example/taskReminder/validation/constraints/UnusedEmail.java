@@ -21,7 +21,7 @@ import javax.validation.Payload;
 @Retention(RUNTIME)
 public @interface UnusedEmail {
 	
-	String message() default "{ Already registerd }";
+	String message() default "このメールアドレスは既に登録されています";
 	
 	Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

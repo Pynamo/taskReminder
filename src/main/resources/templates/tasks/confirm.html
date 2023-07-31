@@ -19,7 +19,7 @@
 							<h5 class="card-title">タスク名：</h5>
 							<p class="card-text" th:text="*{name}"></p>
 							<h5 class="card-title">想定負荷：</h5>
-							<p class="card-text" th:text="*{load}"></p>
+							<p class="card-text" th:text="${loadName}"></p>
 							<h5 class="card-title">意気込み：</h5>
 							<p class="card-text" th:text="*{content}"></p>
 
@@ -39,32 +39,6 @@
 			</form>
 
 		</div>
-
-<!-- 
-		<div class="container">
-			<h1>Confirm</h1>
-			<form th:object="${taskForm}" method="post" class="form-horizontal" th:action="@{/create}">
-
-				<div class="mb-3">
-					<label class="form-label" th:text="#{A0002_task_name_input_label}">驛｢�ｽｧ�ｿｽ�ｽｽ�ｽｿ驛｢�ｽｧ�ｿｽ�ｽｽ�ｽｹ驛｢�ｽｧ�ｿｽ�ｽｽ�ｽｯ髯ｷ�ｽｷ�ｿｽ�ｽｿ�ｽｽ</label> <span class="text-danger" th:errors=*{name}></span> <span
-						th:text="*{name}"></span>
-					<input type="hidden" th:field="*{name}" />
-				</div>
-				<div class="mb-3">
-					<label class="form-label" th:text="#{A0002_task_load_input_label}">鬮ｮ蜈ｷ�ｽｿ�ｽｽ鬮｣蛹��ｽｽ�ｽｷ</label> <span th:text="*{load}"></span>
-					<input type="hidden" th:field="*{load}" />
-				</div>
-				<div class="mb-3">
-					<label class="form-label" th:text="#{A0002_task_content_input_label}">髫ｲ�ｽ｢闕ｵ證ｦ�ｽｽ�ｽｰ髣埼屮�ｽｽ�ｽｾ�ｿｽ�ｽｽ�ｽｼ驍ｵ�ｽｺ�ｿｽ�ｽｽ�ｽｿ</label> <span class="text-danger" th:errors=*{content}></span> <span
-						th:text="*{content}"></span>
-					<input type="hidden" th:field="*{content}" />
-				</div>
-				<input type="hidden" th:field="*{taskId}" />
-				<input type="submit" class="btn btn-secondary btn-lg" name="redo" th:value="#{SYSCOMMON.back_button}" />
-				<input type="submit" class="btn btn-primary btn-lg" th:value="#{A0002_add_task_button}" />
-			</form>
-		</div>
--->
 
 	</div>
 </body>

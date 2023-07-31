@@ -50,13 +50,6 @@ public class TasksController {
 
 	protected static Logger log = LoggerFactory.getLogger(TasksController.class);
 
-	// TODO 国際化やってみる
-	// TODO トランザクショントークンチェックやってみる（その前にユーザー認証かも
-	// TODO 単体テスト書いてみる
-	// TODO CSRF対策やってみる
-	// TODO XSS対策やってみる
-	// TODO ロギングやってみる
-
 	@Autowired
 	private TaskService taskService;
 	@Autowired
@@ -64,42 +57,53 @@ public class TasksController {
 	@Autowired
 	private MessageSource messages;
 
-
 	/**
-	 * タスク一覧表示 タスクが一つも登録されていない場合はResourceNotFoundException発生
+	 * タスク一覧表示
 	 */
 	@GetMapping
 	public String list(Principal principal, Model model) {
 
 		Authentication authentication = (Authentication) principal;
 		UserInf user = (UserInf) authentication.getPrincipal();
+		
 
 		List<Task> tasks = new ArrayList<>();
 
+		// タスク一覧を取得
 		try {
 			tasks = taskService.getTaskList(user.getUserId());
 
 		} catch (ResourceNotFoundException e) {
-			// TODO 画面にメッセージを出力する
+			log.error("Task is not found");
+			displayMessageForwardHelper(
+					MessageAlertLevel.WARNING, 
+					"タスクを登録しましょう", 
+					model);
 		}
 
 		List<TaskForm> list = new ArrayList<>();
 		list = TaskMapper.INSTANCE.tasksToTaskForm(tasks);
 		
+		
+		// 各タスクの実行回数を取得
 		try {
 			list = taskService.getTaskNumberOfExecution(list);
 		} catch(SystemException e) {
-			// TODO システム例外IDを画面に表示する
+			log.error("Task is not found");
+			displayMessageForwardHelper(
+					MessageAlertLevel.WARNING, 
+					"システム例外が発生しました", 
+					model);
 		}
-		
 		
 		model.addAttribute("list", list);
 
 		return "tasks/index";
 	}
 
+	
 	/**
-	 * 新規作成フォーム（更新も兼用）
+	 * タスク新規作成フォームの表示
 	 */
 	@GetMapping(value = "/create", params = "form")
 	public String createForm(Model model) {
@@ -112,11 +116,15 @@ public class TasksController {
 		return "tasks/new";
 	}
 
+	
 	/**
-	 * 新規作成内容の確認
+	 * タスク新規作成内容の確認
 	 */
 	@PostMapping(value = "/create", params = "confirm")
-	public String createConfirm(@Validated TaskForm taskForm, BindingResult result, Model model) {
+	public String createConfirm(
+			@Validated TaskForm taskForm, 
+			BindingResult result, 
+			Model model) {
 
 		if (result.hasErrors()) {
 			model.addAttribute("loadMst", Load.getLoadData());
@@ -124,13 +132,15 @@ public class TasksController {
 			return "tasks/new";
 		}
 		
+		// 柴犬画像の取得（ランダム）
 		String imgUrl = taskService.getSibaImageUrl();
 
 		taskForm.setImgUrl(imgUrl);
 		
 		model.addAttribute("taskForm", taskForm);
-
-		// TODO セレクトボックスのコード値ではなく値を渡すにはどうすれば？
+		// 想定負荷コードが確認欄に表示されてしまうことを避けるため、名称に変換してから渡す
+		model.addAttribute("loadName", Load.getValue(taskForm.getLoad()).getName());
+		
 		return "tasks/confirm";
 	}
 
@@ -147,7 +157,7 @@ public class TasksController {
 	}
 
 	/**
-	 * タスクを作成 タスクが既に3つ以上登録されていた場合はBuisinessException発生
+	 * タスク作成
 	 */
 	@PostMapping(value = "/create")
 	public String create(@Validated TaskForm taskForm, BindingResult bindingResult, Principal principal,
@@ -163,19 +173,22 @@ public class TasksController {
 			log.error("Task is full!");
 			displayMessageRedirectHelper(
 					MessageAlertLevel.ERROR, 
-					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう", // TODO
+					"3個以上タスクを登録できません。追加したい場合は既存のタスクを削除しましょう",
 					redirAttrs);
 
 			return "redirect:/";
 		}
 
-		displayMessageRedirectHelper(MessageAlertLevel.SUCCESS, "新しいタスクを登録しました。頑張って習慣化しましょう！", redirAttrs);
+		displayMessageRedirectHelper(
+				MessageAlertLevel.SUCCESS, 
+				"新しいタスクを登録しました。頑張って習慣化しましょう！", 
+				redirAttrs);
 
 		return "redirect:/";
 	}
 
 	/**
-	 * 削除画面呼び出し タスクが一つも登録されていない時はResouceNotFoundException発生
+	 * 削除画面表示
 	 */
 	@GetMapping(value = "/delete", params = "form")
 	public String deleteList(Principal principal, Model model) {
@@ -188,7 +201,11 @@ public class TasksController {
 		try {
 			tasks = taskService.getTaskList(user.getUserId());
 		} catch (ResourceNotFoundException e) {
-			// TODO 削除対象が見つからない時はエラーメッセージ表示
+			log.error("Task is not found");
+			displayMessageForwardHelper(
+					MessageAlertLevel.WARNING, 
+					"タスクが存在しません", 
+					model);
 		}
 
 		TaskFormList taskFormList = new TaskFormList();
@@ -202,24 +219,10 @@ public class TasksController {
 		return "tasks/delete";
 	}
 
-	/**
-	 * 削除実行 削除対象が存在しない時はResouceNotFoundException発生 削除対象が既に削除されている時はSystemException発生
-	 */
-	// @TransactionTokenCheck
-	/*
-	 * @PostMapping(value="/delete") public String delete(
-	 * 
-	 * @RequestParam("task_id") long taskId, Principal principal, Model model) {
-	 * 
-	 * try { taskService.deleteTask(taskId); } catch(ResourceNotFoundException e) {
-	 * log.error("Task not found!"); displayMessageForwardHelper(
-	 * MessageAlertLevel.ERROR, "削除する対象が見つかりません", model); } catch(BusinessException
-	 * e) { log.error("Task is deleted!"); displayMessageForwardHelper(
-	 * MessageAlertLevel.ERROR, "対象は既に削除されています", model); }
-	 * 
-	 * return "redirect:/delete?form"; }
-	 */
 
+	/**
+	 * タスク削除
+	 */
 	@PostMapping(value = "/delete")
 	public String deleteSelected(
 			TaskFormList taskFormList, 
@@ -233,10 +236,12 @@ public class TasksController {
 
 		int counter = 0;
 
+		// タスク一覧から選択済のタスクを削除する
 		for (TaskForm taskForm : taskFormList.getTaskFormList()) {
 
 			if (taskForm.isSelected()) {
 
+				// 選択されているタスク数を数えるためのカウンター
 				counter += 1;
 
 				try {
@@ -258,7 +263,7 @@ public class TasksController {
 				}
 			}
 		}
-
+		
 		if (counter == 0) {
 			displayMessageRedirectHelper(MessageAlertLevel.WARNING, "削除するタスクを選択してください", redirAttrs);
 		} else {
@@ -269,8 +274,7 @@ public class TasksController {
 	}
 
 	/**
-	 * タスク内容の更新（タスクを取得し、新規作成時と同じhtmlのフォームに値を詰める）
-	 * 対象のタスクが存在しない時はResourceNotFoundException発生
+	 * タスク更新画面表示
 	 */
 	@GetMapping(value = "/update")
 	public String updateForm(
@@ -296,6 +300,7 @@ public class TasksController {
 		return "tasks/update"; 
 	}
 	
+	// タスク更新
 	@PostMapping(value = "/update")
 	public String update(
 			@Validated TaskForm taskForm, 
@@ -331,17 +336,21 @@ public class TasksController {
 		
 		
 		taskService.update(task);
-		displayMessageRedirectHelper(MessageAlertLevel.SUCCESS, "タスクを更新しました。新規一転頑張りましょう！", redirAttrs);
-		
+		displayMessageRedirectHelper(
+				MessageAlertLevel.SUCCESS, 
+				"タスクを更新しました。新規一転頑張りましょう！", 
+				redirAttrs);
 		
 		return "redirect:/";
 	}
 
 	/**
-	 * タスク詳細画面表示（実行履歴をグラフ表示） 対象のタスクが存在しない時はResourceNotFoundException発生
+	 * タスク詳細画面表示（実行履歴をグラフ表示） 
 	 */
 	@GetMapping(value = "/detail")
-	public String detail(@RequestParam("task_id") long taskId, Model model) {
+	public String detail(
+			@RequestParam("task_id") long taskId, 
+			Model model) {
 
 		Task task = new Task();
 
@@ -352,15 +361,13 @@ public class TasksController {
 			displayMessageForwardHelper(MessageAlertLevel.ERROR, "対象が見つかりません", model);
 		}
 
-		/**
-		 * タイトルにタスク名を挿入する
-		 */
+		
+		// タイトルにタスク名を挿入する
 		String title = messages.getMessage("A0006_title", new String[] { task.getName() }, Locale.JAPAN);
 		model.addAttribute("title", title);
 
-		/**
-		 * サブタイトルをタスクの負荷によって変更する
-		 */
+		
+		// サブタイトルをタスクの負荷によって変更する
 		String subtitle = "";
 
 		if (task.getLoad().equals(Load.LOW)) {
@@ -382,7 +389,10 @@ public class TasksController {
 			list = taskExecuteService.getTaskExecuteHistory(taskId);
 		} catch (BusinessException e) {
 			log.debug("このタスクは過去に一度も実行されていません");
-			displayMessageForwardHelper(MessageAlertLevel.WARNING, "このタスクはまだ一度も実行されていないため実績は表示されません。", model);
+			displayMessageForwardHelper(
+					MessageAlertLevel.WARNING, 
+					"このタスクはまだ一度も実行されていないため実績は表示されません。", 
+					model);
 
 			model.addAttribute("chartInputData", chartInputData);
 
@@ -391,8 +401,12 @@ public class TasksController {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 
+		//　実行回数を積み上げるためのカウンター
+		int counter = 0;
+		
 		for (TasksExecutionHistory data : list) {
-			chartInputData.add(new ChartJsInputDataObject(sdf.format(data.getCreatedAt()), 1));
+			counter += 1;
+			chartInputData.add(new ChartJsInputDataObject(sdf.format(data.getCreatedAt()), counter));
 		}
 
 		model.addAttribute("chartInputData", chartInputData);
@@ -400,6 +414,10 @@ public class TasksController {
 		return "tasks/detail";
 	}
 
+	
+	/*
+	 * リダイレクト先にメッセージを表示するためのヘルパー関数
+	 */
 	private void displayMessageRedirectHelper(MessageAlertLevel level, String message, RedirectAttributes redirAttrs) {
 
 		redirAttrs.addFlashAttribute("hasMessage", true); 
@@ -408,6 +426,9 @@ public class TasksController {
 
 	}
 
+	/*
+	 * フォワード先にメッセージを表示するためのヘルパー関数
+	 */
 	private void displayMessageForwardHelper(MessageAlertLevel level, String message, Model model) {
 
 		model.addAttribute("hasMessage", true);

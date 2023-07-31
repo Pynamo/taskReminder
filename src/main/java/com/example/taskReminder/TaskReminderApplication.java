@@ -16,12 +16,12 @@ public class TaskReminderApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 		SpringApplication.run(TaskReminderApplication.class, args);
 	}
-	
+	/*
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(TaskReminderApplication.class);
 	}
-	
+	*/
     @Bean
     public WebClient rest(ClientRegistrationRepository clients, OAuth2AuthorizedClientRepository authz) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 = new ServletOAuth2AuthorizedClientExchangeFilterFunction(

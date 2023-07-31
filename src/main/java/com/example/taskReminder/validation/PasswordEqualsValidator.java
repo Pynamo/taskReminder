@@ -32,7 +32,7 @@ public class PasswordEqualsValidator implements Validator {
 			errors.rejectValue(
 					"passwordConfirmation",
 					"PasswordEqualsValidator.userForm.password",
-					"password and confirm password must be same.");
+					"パスワードが異なります");
 		}	
 	}
 }

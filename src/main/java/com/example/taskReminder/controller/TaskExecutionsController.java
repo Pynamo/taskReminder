@@ -29,7 +29,6 @@ public class TaskExecutionsController {
 	
 	/**
 	 * タスク実行処理
-	 * タスクが既に実行済であればSystemException発生
 	 */
 	@PostMapping(value="/execute")
 	public String execute(
