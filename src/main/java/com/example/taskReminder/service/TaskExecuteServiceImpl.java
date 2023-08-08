@@ -55,7 +55,7 @@ public class TaskExecuteServiceImpl implements TaskExecuteService {
 	@Override
 	public List<TasksExecutionHistory> getTaskExecuteHistory(long taskId) throws BusinessException {
 		
-		List<TasksExecutionHistory> list = taskExecutionHistoryRepository.findCreatedAtByTaskIdOrderByCreatedAtDesc(taskId);
+		List<TasksExecutionHistory> list = taskExecutionHistoryRepository.findCreatedAtByTaskIdOrderByCreatedAt(taskId);
 		
 		if(list.size() == 0) {
 			throw new BusinessException("");

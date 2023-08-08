@@ -33,8 +33,8 @@ public class TaskExecutionsController {
 	@PostMapping(value="/execute")
 	public String execute(
 			@RequestParam("task_id") long taskId, 
-			RedirectAttributes redirAttrs,
-			Model model) {
+			RedirectAttributes redirAttrs
+			) {
 		
 		try {
 			taskExecuteService.execute(taskId);

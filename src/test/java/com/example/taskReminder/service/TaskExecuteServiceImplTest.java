@@ -97,7 +97,7 @@ public class TaskExecuteServiceImplTest {
 			
 			List<TasksExecutionHistory> list = new ArrayList<>();
 
-			when(taskExecutionHistoryRepository.findCreatedAtByTaskIdOrderByCreatedAtDesc(taskId)).thenReturn(list);
+			when(taskExecutionHistoryRepository.findCreatedAtByTaskIdOrderByCreatedAt(taskId)).thenReturn(list);
 			
 			assertThrows(BusinessException.class, () -> taskExecuteServiceImpl.getTaskExecuteHistory(taskId));		
 		}
@@ -111,7 +111,7 @@ public class TaskExecuteServiceImplTest {
 			List<TasksExecutionHistory> list = new ArrayList<>();
 			list.add(tasksExecutionHistory);
 			
-			when(taskExecutionHistoryRepository.findCreatedAtByTaskIdOrderByCreatedAtDesc(taskId)).thenReturn(list);
+			when(taskExecutionHistoryRepository.findCreatedAtByTaskIdOrderByCreatedAt(taskId)).thenReturn(list);
 			
 			try {
 				taskExecuteServiceImpl.getTaskExecuteHistory(taskId);

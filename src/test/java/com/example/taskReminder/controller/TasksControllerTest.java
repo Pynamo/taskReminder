@@ -190,7 +190,7 @@ public class TasksControllerTest {
 	        .andExpect(status().isOk())
 	        .andExpect(view().name("tasks/new"))
 	        .andExpect(model().attributeExists("taskForm"))
-	        .andExpect(model().attribute("loadMst", Load.getLoadData()));;	    
+	        .andExpect(model().attribute("loadMst", Load.getLoadData()));    
 	    
 	}
 	
