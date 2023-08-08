@@ -55,7 +55,6 @@ public class UsersController {
 				redirAttrs
 				);
 		
-		
 		return "redirect:/login";
 	}
 	

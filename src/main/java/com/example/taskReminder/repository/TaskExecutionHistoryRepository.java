@@ -13,5 +13,5 @@ import com.example.taskReminder.entity.TasksExecutionHistory;
 public interface TaskExecutionHistoryRepository extends JpaRepository <TasksExecutionHistory, Long> {
 
 	Integer countByTaskId(Long taskId);
-	List<TasksExecutionHistory> findCreatedAtByTaskIdOrderByCreatedAtDesc(Long taskId); 
+	List<TasksExecutionHistory> findCreatedAtByTaskIdOrderByCreatedAt(Long taskId); 
 }
